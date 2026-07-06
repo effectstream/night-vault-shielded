@@ -72,7 +72,17 @@ export class ConvertVaultSimulator {
   }
 
   private advance<R>(res: CircuitResults<ConvertVaultPrivateState, R>): R {
-    this.ctx = res.context;
+    // Each simulator call models its own transaction: keep the updated ledger
+    // state but discard the accumulated Zswap local state (coin receives/sends
+    // recorded by the previous call). Without this, successive deposits share
+    // one transaction-level receive accumulator and large amounts trip its
+    // Uint<64> overflow instead of exercising the contract's own logic.
+    this.ctx = createCircuitContext(
+      this.contractAddress,
+      COIN_PK,
+      res.context.currentQueryContext.state,
+      res.context.currentPrivateState,
+    );
     return res.result;
   }
 

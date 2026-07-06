@@ -433,35 +433,35 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('withdrawShielded',
                                      'argument 1 (as invoked from Typescript)',
-                                     'convert-vault.compact line 340 char 1',
+                                     'convert-vault.compact line 348 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(secret_0.buffer instanceof ArrayBuffer && secret_0.BYTES_PER_ELEMENT === 1 && secret_0.length === 32)) {
           __compactRuntime.typeError('withdrawShielded',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'convert-vault.compact line 340 char 1',
+                                     'convert-vault.compact line 348 char 1',
                                      'Bytes<32>',
                                      secret_0)
         }
         if (!(typeof(amount_0) === 'bigint' && amount_0 >= 0n && amount_0 <= 18446744073709551615n)) {
           __compactRuntime.typeError('withdrawShielded',
                                      'argument 2 (argument 3 as invoked from Typescript)',
-                                     'convert-vault.compact line 340 char 1',
+                                     'convert-vault.compact line 348 char 1',
                                      'Uint<0..18446744073709551616>',
                                      amount_0)
         }
         if (!(typeof(recipient_0) === 'object' && recipient_0.bytes.buffer instanceof ArrayBuffer && recipient_0.bytes.BYTES_PER_ELEMENT === 1 && recipient_0.bytes.length === 32)) {
           __compactRuntime.typeError('withdrawShielded',
                                      'argument 3 (argument 4 as invoked from Typescript)',
-                                     'convert-vault.compact line 340 char 1',
+                                     'convert-vault.compact line 348 char 1',
                                      'struct ZswapCoinPublicKey<bytes: Bytes<32>>',
                                      recipient_0)
         }
         if (!(nonce_0.buffer instanceof ArrayBuffer && nonce_0.BYTES_PER_ELEMENT === 1 && nonce_0.length === 32)) {
           __compactRuntime.typeError('withdrawShielded',
                                      'argument 4 (argument 5 as invoked from Typescript)',
-                                     'convert-vault.compact line 340 char 1',
+                                     'convert-vault.compact line 348 char 1',
                                      'Bytes<32>',
                                      nonce_0)
         }
@@ -493,14 +493,14 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('getBalance',
                                      'argument 1 (as invoked from Typescript)',
-                                     'convert-vault.compact line 363 char 1',
+                                     'convert-vault.compact line 375 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(secret_0.buffer instanceof ArrayBuffer && secret_0.BYTES_PER_ELEMENT === 1 && secret_0.length === 32)) {
           __compactRuntime.typeError('getBalance',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'convert-vault.compact line 363 char 1',
+                                     'convert-vault.compact line 375 char 1',
                                      'Bytes<32>',
                                      secret_0)
         }
@@ -1260,6 +1260,13 @@ export class Contract {
                         recipient_0)
   {
     __compactRuntime.assert(amount_0 > 0n, 'amount must be positive');
+    __compactRuntime.assert(recipient_0.is_left ?
+                            !this._equal_3({ bytes: new Uint8Array(32) },
+                                           recipient_0.left)
+                            :
+                            !this._equal_4({ bytes: new Uint8Array(32) },
+                                           recipient_0.right),
+                            'invalid recipient');
     const _amount_0 = amount_0;
     this._debitKey_0(context,
                      partialProofData,
@@ -1280,6 +1287,9 @@ export class Contract {
                       nonce_0)
   {
     __compactRuntime.assert(amount_0 > 0n, 'amount must be positive');
+    __compactRuntime.assert(!this._equal_5({ bytes: new Uint8Array(32) },
+                                           recipient_0),
+                            'invalid recipient');
     const _amount_0 = amount_0;
     this._debitKey_0(context,
                      partialProofData,
@@ -1323,6 +1333,30 @@ export class Contract {
   }
   _equal_2(x0, y0) {
     if (!x0.every((x, i) => y0[i] === x)) { return false; }
+    return true;
+  }
+  _equal_3(x0, y0) {
+    {
+      let x1 = x0.bytes;
+      let y1 = y0.bytes;
+      if (!x1.every((x, i) => y1[i] === x)) { return false; }
+    }
+    return true;
+  }
+  _equal_4(x0, y0) {
+    {
+      let x1 = x0.bytes;
+      let y1 = y0.bytes;
+      if (!x1.every((x, i) => y1[i] === x)) { return false; }
+    }
+    return true;
+  }
+  _equal_5(x0, y0) {
+    {
+      let x1 = x0.bytes;
+      let y1 = y0.bytes;
+      if (!x1.every((x, i) => y1[i] === x)) { return false; }
+    }
     return true;
   }
 }

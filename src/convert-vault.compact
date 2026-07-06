@@ -303,6 +303,14 @@ export circuit withdrawUnshielded(
   recipient: Either<ContractAddress, UserAddress>
 ): [] {
   assert(amount > 0, "amount must be positive");
+  // A zero recipient irrecoverably strands the released NIGHT (OpenZeppelin's
+  // isKeyOrAddressZero convention: zero == burn). Guard both Either branches.
+  assert(
+    recipient.is_left
+      ? !(default<ContractAddress> == recipient.left)
+      : !(default<UserAddress> == recipient.right),
+    "invalid recipient"
+  );
   const _amount = disclose(amount) as Uint<128>;
   debitKey(getBalanceKey(secret), _amount);
   sendUnshielded(nativeToken(), _amount, disclose(recipient));
@@ -344,6 +352,10 @@ export circuit withdrawShielded(
   nonce: Bytes<32>
 ): ShieldedCoinInfo {
   assert(amount > 0, "amount must be positive");
+  // Minting to the zero key is minting to Midnight's burn address: the wrapper
+  // would be unspendable while the debited credit and its backing NIGHT stay
+  // locked in the vault forever.
+  assert(!(default<ZswapCoinPublicKey> == recipient), "invalid recipient");
   const _amount = disclose(amount);
   debitKey(getBalanceKey(secret), _amount as Uint<128>);
   return mintShieldedToken(
