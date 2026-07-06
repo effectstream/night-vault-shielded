@@ -1,0 +1,75 @@
+services:
+  proof-server:
+    image: 'midnightntwrk/proof-server:${PROOF_TAG:-8.1.0}'
+    cap_drop:
+      - ALL
+    security_opt:
+      - 'no-new-privileges:true'
+    ports:
+      - '127.0.0.1::6300'
+    environment:
+      RUST_BACKTRACE: 'full'
+      EXTRA_ARGS: '-v'
+    # No HEALTHCHECK: the image is distroless (no curl/sh), so curl-based
+    # checks always fail. The helper waits on the listening port instead.
+
+  indexer:
+    image: 'midnightntwrk/indexer-standalone:${INDEXER_TAG:-4.3.3}'
+    cap_drop:
+      - ALL
+    security_opt:
+      - 'no-new-privileges:true'
+    ports:
+      - '127.0.0.1::8088'
+    environment:
+      RUST_LOG: 'indexer=info,chain_indexer=info,indexer_api=info,wallet_indexer=info,indexer_common=info,fastrace_opentelemetry=off,info'
+      APP__APPLICATION__NETWORK_ID: 'undeployed'
+      APP__INFRA__NODE__URL: 'ws://node:9944'
+      APP__INFRA__STORAGE__PASSWORD: 'indexer'
+      APP__INFRA__PUB_SUB__PASSWORD: 'indexer'
+      APP__INFRA__LEDGER_STATE_STORAGE__PASSWORD: 'indexer'
+      APP__INFRA__SECRET: '303132333435363738393031323334353637383930313233343536373839303132'
+      APP__INFRA__SPO_NODE__URL: 'ws://node:9944'
+      APP__INFRA__SPO_NODE__BLOCKFROST_ID: 'e2e-test-dummy-id'
+    healthcheck:
+      # NOTE: the indexer-standalone image has neither curl nor wget, so an HTTP `/ready` probe can never pass and the
+      # container stays "unhealthy" → testcontainers aborts startup. Use the file the indexer writes when running.
+      test: ['CMD-SHELL', 'cat /var/run/indexer-standalone/running']
+      interval: 5s
+      timeout: 5s
+      retries: 36
+      start_period: 60s
+    depends_on:
+      node:
+        condition: service_healthy
+
+  node:
+    image: 'midnightntwrk/midnight-node:${NODE_TAG:-1.0.0}'
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+    security_opt:
+      - 'no-new-privileges:true'
+    ports:
+      - '127.0.0.1::9944'
+    volumes:
+      - node-data:/data
+    healthcheck:
+      test:
+        - 'CMD-SHELL'
+        - >
+          curl -fs -H 'Content-Type: application/json' -d
+          '{"id":1,"jsonrpc":"2.0","method":"chain_getBlockHash","params":[1]}' http://localhost:9944 | grep -q
+          '"result":"0x'
+      interval: 2s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+    environment:
+      CFG_PRESET: 'dev'
+      SIDECHAIN_BLOCK_BENEFICIARY: '04bcf7ad3be7a5c790460be82a713af570f22e0f801f6659ab8e84a52be6969e'
+volumes:
+  node-data:
