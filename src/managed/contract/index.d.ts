@@ -11,6 +11,22 @@ export type ImpureCircuits<PS> = {
   depositUnshielded(context: __compactRuntime.CircuitContext<PS>,
                     secret_0: Uint8Array,
                     amount_0: bigint): __compactRuntime.CircuitResults<PS, []>;
+  depositShielded_notWorking(context: __compactRuntime.CircuitContext<PS>,
+                             secret_0: Uint8Array,
+                             coin_0: { nonce: Uint8Array,
+                                       color: Uint8Array,
+                                       value: bigint
+                                     },
+                             amount_0: bigint,
+                             refundTo_0: { is_left: boolean,
+                                           left: { bytes: Uint8Array },
+                                           right: { bytes: Uint8Array }
+                                         }): __compactRuntime.CircuitResults<PS, { is_some: boolean,
+                                                                                   value: { nonce: Uint8Array,
+                                                                                            color: Uint8Array,
+                                                                                            value: bigint
+                                                                                          }
+                                                                                 }>;
   depositShielded(context: __compactRuntime.CircuitContext<PS>,
                   secret_0: Uint8Array,
                   coin_0: { nonce: Uint8Array, color: Uint8Array, value: bigint
@@ -46,6 +62,22 @@ export type ProvableCircuits<PS> = {
   depositUnshielded(context: __compactRuntime.CircuitContext<PS>,
                     secret_0: Uint8Array,
                     amount_0: bigint): __compactRuntime.CircuitResults<PS, []>;
+  depositShielded_notWorking(context: __compactRuntime.CircuitContext<PS>,
+                             secret_0: Uint8Array,
+                             coin_0: { nonce: Uint8Array,
+                                       color: Uint8Array,
+                                       value: bigint
+                                     },
+                             amount_0: bigint,
+                             refundTo_0: { is_left: boolean,
+                                           left: { bytes: Uint8Array },
+                                           right: { bytes: Uint8Array }
+                                         }): __compactRuntime.CircuitResults<PS, { is_some: boolean,
+                                                                                   value: { nonce: Uint8Array,
+                                                                                            color: Uint8Array,
+                                                                                            value: bigint
+                                                                                          }
+                                                                                 }>;
   depositShielded(context: __compactRuntime.CircuitContext<PS>,
                   secret_0: Uint8Array,
                   coin_0: { nonce: Uint8Array, color: Uint8Array, value: bigint
@@ -84,6 +116,22 @@ export type Circuits<PS> = {
   depositUnshielded(context: __compactRuntime.CircuitContext<PS>,
                     secret_0: Uint8Array,
                     amount_0: bigint): __compactRuntime.CircuitResults<PS, []>;
+  depositShielded_notWorking(context: __compactRuntime.CircuitContext<PS>,
+                             secret_0: Uint8Array,
+                             coin_0: { nonce: Uint8Array,
+                                       color: Uint8Array,
+                                       value: bigint
+                                     },
+                             amount_0: bigint,
+                             refundTo_0: { is_left: boolean,
+                                           left: { bytes: Uint8Array },
+                                           right: { bytes: Uint8Array }
+                                         }): __compactRuntime.CircuitResults<PS, { is_some: boolean,
+                                                                                   value: { nonce: Uint8Array,
+                                                                                            color: Uint8Array,
+                                                                                            value: bigint
+                                                                                          }
+                                                                                 }>;
   depositShielded(context: __compactRuntime.CircuitContext<PS>,
                   secret_0: Uint8Array,
                   coin_0: { nonce: Uint8Array, color: Uint8Array, value: bigint

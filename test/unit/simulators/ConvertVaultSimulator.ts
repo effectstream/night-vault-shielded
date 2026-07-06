@@ -118,6 +118,28 @@ export class ConvertVaultSimulator {
     );
   }
 
+  /**
+   * The `sendImmediateShielded` variant: burns `amount` out of `coin` inside
+   * the transaction (a transient) and refunds the remainder to `refundTo`.
+   * Returns the change coin, or none on a full burn.
+   */
+  depositShieldedWithChange(
+    secret: Uint8Array,
+    coin: ShieldedCoin,
+    amount: bigint,
+    refundTo: { is_left: boolean; left: { bytes: Uint8Array }; right: { bytes: Uint8Array } },
+  ): { is_some: boolean; value: ShieldedCoin } {
+    return this.advance(
+      this.contract.impureCircuits.depositShielded_notWorking(
+        this.ctx,
+        secret,
+        coin,
+        amount,
+        refundTo,
+      ),
+    );
+  }
+
   withdrawUnshielded(
     secret: Uint8Array,
     amount: bigint,

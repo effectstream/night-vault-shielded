@@ -57,6 +57,22 @@ export const depositShielded = (
   coin: { nonce: Uint8Array; color: Uint8Array; value: bigint },
 ) => deployed.callTx.depositShielded(secret, coin);
 
+/** `Either<ZswapCoinPublicKey, ContractAddress>` with the user key (left) populated. */
+export const leftCoinPublicKey = (bytes: Uint8Array) => ({
+  is_left: true,
+  left: { bytes },
+  right: { bytes: new Uint8Array(32) },
+});
+
+/** The sendImmediateShielded variant: burn `amount` of `coin`, refund the rest. */
+export const depositShieldedWithChange = (
+  deployed: DeployedConvertVault,
+  secret: Uint8Array,
+  coin: { nonce: Uint8Array; color: Uint8Array; value: bigint },
+  amount: bigint,
+  refundTo: ReturnType<typeof leftCoinPublicKey>,
+) => deployed.callTx.depositShielded_notWorking(secret, coin, amount, refundTo);
+
 export const withdrawUnshielded = (
   deployed: DeployedConvertVault,
   secret: Uint8Array,

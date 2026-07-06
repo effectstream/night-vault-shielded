@@ -228,7 +228,7 @@ export circuit depositUnshielded(secret: Bytes<32>, amount: Uint<64>): [] {
  * @param {Either<ZswapCoinPublicKey, ContractAddress>} refundTo - Where the change goes.
  * @return {Maybe<ShieldedCoinInfo>} - The change coin, or none if fully burned.
  */
-circuit depositShielded_notWorking(
+export circuit depositShielded_notWorking(
   secret: Bytes<32>,
   coin: ShieldedCoinInfo,
   amount: Uint<128>,
