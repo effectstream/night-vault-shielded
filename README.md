@@ -38,6 +38,20 @@ bun run --filter @zswap-da/contract-convert-vault compact
 
 Compiles with `compactc` 0.30.0 (language ≥ 0.20).
 
+## Testing
+
+Two tiers — see [TESTING.md](TESTING.md) for details and environment variables:
+
+```bash
+bun run compact:fast && bun run test:unit   # 23 simulator tests, no infrastructure, <1s
+bun run compact && bun run test:integration # 8 tests against a real docker stack (~12 min)
+```
+
+The integration suite (midnight-canary harness: midnight-node 1.0.0, indexer
+4.3.3, proof-server 8.1.0, genesis wallets) covers the full round trip in both
+directions, the negative paths, and two-wallet independence. CI runs both
+tiers on every push/PR (`.github/workflows/ci.yml`).
+
 ## Live status (undeployed network, node 0.22.5) — ✅ FULL ROUND TRIP PASSES
 
 Run (force the genesis wallet — the repo `.env` sets a non-genesis mnemonic):
