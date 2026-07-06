@@ -48,7 +48,7 @@ jobs:
   integration:
     name: Integration tests (docker stack)
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 

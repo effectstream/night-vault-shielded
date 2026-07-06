@@ -79,6 +79,29 @@ input that `receiveUnshielded` needs — deposits would fail with
   slow or flaky on shared runners, demote PRs to `bun run smoke` and keep the
   full suite on main + a nightly schedule.
 
+## Security suite
+
+Both tiers carry a dedicated security/border-case suite for the
+token-loss and token-theft vectors:
+
+- **Unit** ([test/unit/convert-vault.security.unit.test.ts](test/unit/convert-vault.security.unit.test.ts)):
+  value-range boundaries (max single deposit, encode-level range rejection,
+  the zswap 2^64−1 coin-value cap, credit accumulation past 2^64 without
+  wrapping), exact-balance withdrawal boundaries, balance-key isolation
+  (zero secret, one-bit-different secrets), the zero-recipient guards, and
+  state integrity after failed calls.
+- **Integration** ([test/integration/convert-vault.security.test.ts](test/integration/convert-vault.security.test.ts)):
+  ledger-enforced properties the simulator cannot falsify — forged
+  (never-minted) coins, inflated coin values, double-burns of a spent coin,
+  nonce-reuse double-mints (duplicate commitment), the reserve invariant
+  (locked NIGHT == credits + outstanding wrapper), and a cross-wallet theft
+  attempt (burning someone else's coin).
+
+The contract asserts `"invalid recipient"` on all-zero withdrawal targets:
+an all-zero coin public key is Midnight's burn representation, so minting to
+it would irrecoverably destroy the wrapper while its backing NIGHT stayed
+locked (this guard was added by this suite; see git history).
+
 ## Known sharp edges
 
 - `getBalance(secret)` **throws** for a never-used secret (`balances.lookup`
