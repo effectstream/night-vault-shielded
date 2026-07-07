@@ -154,3 +154,6 @@ body {
 .footer { display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; margin-top: 20px; }
 .footer-link { color: var(--muted); text-decoration: none; }
 .footer-link:hover { color: var(--accent-2); }
+.footer-vault { max-width: 100%; }
+.footer .addr { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-all; }
+a.footer-link.addr { color: var(--accent-2); }

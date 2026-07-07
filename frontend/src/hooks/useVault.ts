@@ -198,7 +198,7 @@ export function useVault(): VaultState {
 /**
  * Deep error extraction: walks the `cause` chain and surfaces the connector's
  * DAppConnectorAPIError fields (`code`, `reason`), which often ship with an
- * empty `message` — midnight-js's String(err) wrapper reduces those to a bare
+ * empty `message` - midnight-js's String(err) wrapper reduces those to a bare
  * "Error" unless unpacked here.
  */
 export function errMsg(e: unknown): string {

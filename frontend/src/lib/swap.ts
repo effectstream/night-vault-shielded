@@ -12,7 +12,7 @@ import { bytesToHex } from './tokens';
  * The wallet connector returns addresses/keys as bech32m strings (e.g.
  * `mn_shield-cpk_preview1…`), but the circuits take raw 32-byte values. Parse
  * the bech32m payload to bytes, with a hex fallback for already-raw inputs.
- * (Using ledger's encodeCoinPublicKey/encodeUserAddress here fails on bech32m —
+ * (Using ledger's encodeCoinPublicKey/encodeUserAddress here fails on bech32m -
  * "Invalid character 'm' at position 0".)
  */
 function addressToBytes(s: string): Uint8Array {
@@ -179,7 +179,7 @@ export async function runForwardSwap(input: ForwardInput, cb: SwapCallbacks = {}
   upsertPending(contractAddress, swap);
 
   cb.onStep?.('started', 'Locking NIGHT (depositUnshielded)…');
-  cb.onLog?.(`depositUnshielded ${amount} — approve in wallet`);
+  cb.onLog?.(`depositUnshielded ${amount} - approve in wallet`);
   await call(providers, contractAddress, 'depositUnshielded', [secret, amount]);
   swap.step = 'deposited';
   upsertPending(contractAddress, swap);
@@ -187,7 +187,7 @@ export async function runForwardSwap(input: ForwardInput, cb: SwapCallbacks = {}
 
   const nonce = randomBytes32();
   const recipient = { bytes: addressToBytes(coinPublicKey) };
-  cb.onLog?.('withdrawShielded — approve in wallet');
+  cb.onLog?.('withdrawShielded - approve in wallet');
   const res = await withRetry(() =>
     call(providers, contractAddress, 'withdrawShielded', [secret, amount, recipient, nonce]),
   );
@@ -215,7 +215,7 @@ export interface ReverseInput {
 /**
  * wNIGHT → NIGHT: depositShielded(secret, coin) then
  * withdrawUnshielded(secret, coin.value, myAddress). Picks a dApp-minted coin
- * (best match ≥ amount, else largest) and converts it in full — remainder-free.
+ * (best match ≥ amount, else largest) and converts it in full - remainder-free.
  * Best-effort: if no tracked coin exists, throws with a clear explanation
  * (the connector cannot enumerate arbitrary wrapper coins).
  */
@@ -255,7 +255,7 @@ export async function runReverseSwap(input: ReverseInput, cb: SwapCallbacks = {}
   upsertPending(contractAddress, swap);
 
   cb.onStep?.('started', 'Burning wNIGHT (depositShielded)…');
-  cb.onLog?.('depositShielded — approve in wallet');
+  cb.onLog?.('depositShielded - approve in wallet');
   await call(providers, contractAddress, 'depositShielded', [secret, coin]);
   // Coin is spent on-chain now; drop it from the tracked set.
   removeCoin(contractAddress, chosen.nonceHex);
@@ -264,7 +264,7 @@ export async function runReverseSwap(input: ReverseInput, cb: SwapCallbacks = {}
   cb.onStep?.('deposited', 'Releasing NIGHT (withdrawUnshielded)…');
 
   const recipient = rightUserAddress(addressToBytes(unshieldedAddress));
-  cb.onLog?.('withdrawUnshielded — approve in wallet');
+  cb.onLog?.('withdrawUnshielded - approve in wallet');
   await withRetry(() => call(providers, contractAddress, 'withdrawUnshielded', [secret, coinValue, recipient]));
   removePending(contractAddress, swap.id);
   cb.onStep?.('done', 'Swap complete');

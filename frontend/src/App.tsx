@@ -1,5 +1,6 @@
 import { useVault } from './hooks/useVault';
 import { trackedWrapperTotal } from './lib/swap';
+import { explorerContractUrl } from './lib/networks';
 import { WalletBar } from './components/WalletBar';
 import { BalancePanel } from './components/BalancePanel';
 import { SwapCard } from './components/SwapCard';
@@ -38,8 +39,24 @@ export default function App() {
       <footer className="footer small muted">
         <span>
           {vault.networkIdConnected ? `Connected to ${vault.networkIdConnected}` : `Network: ${vault.networkKey}`}
-          {vault.contractAddress ? ` · vault ${vault.contractAddress.slice(0, 10)}…` : ' · no contract configured'}
         </span>
+        {vault.contractAddress ? (
+          <span className="footer-vault">
+            vault{' '}
+            {(() => {
+              const url = explorerContractUrl(vault.networkKey, vault.contractAddress);
+              return url ? (
+                <a className="footer-link mono addr" href={url} target="_blank" rel="noreferrer noopener">
+                  {vault.contractAddress}
+                </a>
+              ) : (
+                <span className="mono addr">{vault.contractAddress}</span>
+              );
+            })()}
+          </span>
+        ) : (
+          <span>no contract configured</span>
+        )}
         <a
           className="footer-link"
           href="https://github.com/effectstream/night-vault-shielded"

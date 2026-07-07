@@ -25,7 +25,7 @@ export function hexToUint8Array(hex: string): Uint8Array {
 
 /**
  * Rebuild a connector failure into an Error whose message carries the
- * DAppConnectorAPIError diagnostics (`code`, `reason`) — those fields often
+ * DAppConnectorAPIError diagnostics (`code`, `reason`) - those fields often
  * ship with an empty `message`, which upstream wrappers reduce to "Error".
  */
 function describeConnectorError(stage: string, e: unknown): Error {
@@ -35,7 +35,7 @@ function describeConnectorError(stage: string, e: unknown): Error {
     typeof o.code === 'string' ? `code=${o.code}` : null,
     typeof o.reason === 'string' && o.reason ? `reason=${o.reason}` : null,
   ].filter(Boolean);
-  // A bare `Error` with no fields stringifies uselessly — dump its own props.
+  // A bare `Error` with no fields stringifies uselessly - dump its own props.
   const detail = bits.length ? bits.join(' ') : dumpError(e);
   return new Error(`${stage} failed: ${detail}`, { cause: e });
 }
@@ -123,7 +123,7 @@ export function createWalletProvidersFromConnectedAPI(
 /**
  * Serialize an unknown error-like object. Understands Effect `FiberFailure`s
  * (what Lace's in-page connector throws): the real failure hides in a
- * symbol-keyed `Cause`, which `Cause.pretty` can render — Effect registers its
+ * symbol-keyed `Cause`, which `Cause.pretty` can render - Effect registers its
  * type IDs via `Symbol.for`, so this works across bundle copies.
  */
 function dumpError(e: unknown): string {
@@ -148,7 +148,7 @@ function dumpError(e: unknown): string {
   return deepDump(e);
 }
 
-/** Skip huge byte-array-like objects (e.g. serialized txData) — pure noise. */
+/** Skip huge byte-array-like objects (e.g. serialized txData) - pure noise. */
 function isByteBag(v: object): boolean {
   const keys = Object.getOwnPropertyNames(v);
   if (keys.length < 64) return false;

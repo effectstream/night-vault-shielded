@@ -8,7 +8,7 @@ export function BalancePanel({
 }: {
   balances?: Balances;
   onRefresh: () => void;
-  /** wNIGHT this dApp has minted (tracked coins) — used to detect a real mismatch. */
+  /** wNIGHT this dApp has minted (tracked coins) - used to detect a real mismatch. */
   mintedTotal: bigint;
 }) {
   // Only a real anomaly warrants a warning: we minted wrapper coins in this
@@ -21,12 +21,12 @@ export function BalancePanel({
       <div className="balances-row">
         <span className="bal">
           <span className="bal-k">NIGHT</span>
-          <span className="bal-v">{balances ? formatAmount(balances.nativeNight) : '—'}</span>
+          <span className="bal-v">{balances ? formatAmount(balances.nativeNight) : '-'}</span>
         </span>
         <span className="bal-sep">·</span>
         <span className="bal">
           <span className="bal-k">wNIGHT</span>
-          <span className="bal-v">{balances ? formatAmount(balances.wrapper) : '—'}</span>
+          <span className="bal-v">{balances ? formatAmount(balances.wrapper) : '-'}</span>
         </span>
         <button className="link-btn" onClick={onRefresh} title="Refresh balances">
           ↻

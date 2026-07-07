@@ -33,10 +33,23 @@ export const contractAddressFor = (key: NetworkOption['key']): string | undefine
   return v && v.trim().length > 0 ? v.trim() : undefined;
 };
 
+/** Midnight explorer base per network (only where known; undeployed has none). */
+const EXPLORER_BASE: Record<NetworkOption['key'], string | undefined> = {
+  preview: 'https://preview.midnightexplorer.com',
+  preprod: undefined,
+  undeployed: undefined,
+};
+
+/** Explorer URL for a contract, or undefined if that network has no explorer. */
+export const explorerContractUrl = (key: NetworkOption['key'], address: string): string | undefined => {
+  const base = EXPLORER_BASE[key];
+  return base ? `${base}/contracts/0x${address.replace(/^0x/, '')}` : undefined;
+};
+
 /**
  * Networks that actually have a deployed contract configured. The dropdown
  * shows only these, so unconfigured networks (e.g. preprod) appear the moment
- * their VITE_CONTRACT_ADDRESS_* is set — no code change needed.
+ * their VITE_CONTRACT_ADDRESS_* is set - no code change needed.
  */
 export const configuredNetworks = (): NetworkOption[] => {
   const live = NETWORKS.filter((n) => contractAddressFor(n.key) !== undefined);

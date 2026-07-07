@@ -172,7 +172,7 @@ export function SwapCard({ vault }: { vault: VaultState }) {
         </p>
       )}
       <p className="small muted" style={{ marginBottom: 0 }}>
-        Each swap is two transactions — expect two wallet approvals.
+        Each swap is two transactions - expect two wallet approvals.
       </p>
     </div>
   );

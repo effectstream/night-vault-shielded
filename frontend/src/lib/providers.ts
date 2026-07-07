@@ -19,7 +19,7 @@ export type ShieldedAddress = {
  * Assemble the midnight-js provider suite from a connected wallet:
  * - zkConfig: fetched from the served /contract/compiled/convert-vault path
  * - publicData: the wallet's indexer (with a post-block zswap-state refresh)
- * - proof: the WALLET's proving provider — the frontend never names a proof
+ * - proof: the WALLET's proving provider - the frontend never names a proof
  *   server (proverServerUri is deprecated in favor of getProvingProvider), so
  *   the wallet owns proving and this works on any deployment.
  * - wallet/midnight: the connected wallet (balance + submit)
