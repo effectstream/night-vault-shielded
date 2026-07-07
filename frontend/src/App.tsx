@@ -1,4 +1,4 @@
-import { useVault } from './hooks/useVault';
+import { useShieldedNight } from './hooks/useShieldedNight';
 import { trackedWrapperTotal } from './lib/swap';
 import { explorerContractUrl } from './lib/networks';
 import { WalletBar } from './components/WalletBar';
@@ -8,62 +8,68 @@ import { PendingSwaps } from './components/PendingSwaps';
 import { ActivityLog } from './components/ActivityLog';
 
 export default function App() {
-  const vault = useVault();
+  const sn = useShieldedNight();
 
   return (
     <div className="app">
-      <WalletBar vault={vault} />
+      <WalletBar sn={sn} />
 
-      {vault.error && (
+      {sn.error && (
         <div className="card">
           <p className="err" style={{ margin: 0 }}>
-            {vault.error}
+            {sn.error}
           </p>
         </div>
       )}
 
-      {vault.connected && (
+      {sn.connected && (
         <BalancePanel
-          balances={vault.balances}
-          onRefresh={() => void vault.refreshBalances()}
-          mintedTotal={vault.contractAddress ? trackedWrapperTotal(vault.contractAddress) : 0n}
+          balances={sn.balances}
+          onRefresh={() => void sn.refreshBalances()}
+          mintedTotal={sn.contractAddress ? trackedWrapperTotal(sn.contractAddress) : 0n}
         />
       )}
 
-      <SwapCard vault={vault} />
+      <SwapCard sn={sn} />
 
-      <PendingSwaps vault={vault} />
+      <PendingSwaps sn={sn} />
 
-      <ActivityLog logs={vault.logs} />
+      <ActivityLog logs={sn.logs} />
 
       <footer className="footer small muted">
         <span>
-          {vault.networkIdConnected ? `Connected to ${vault.networkIdConnected}` : `Network: ${vault.networkKey}`}
+          {sn.networkIdConnected ? `Connected to ${sn.networkIdConnected}` : `Network: ${sn.networkKey}`}
         </span>
-        {vault.contractAddress ? (
-          <span className="footer-vault">
-            vault{' '}
+        {sn.contractAddress ? (
+          <span className="footer-contract">
+            contract{' '}
             {(() => {
-              const url = explorerContractUrl(vault.networkKey, vault.contractAddress);
+              const url = explorerContractUrl(sn.networkKey, sn.contractAddress);
               return url ? (
                 <a className="footer-link mono addr" href={url} target="_blank" rel="noreferrer noopener">
-                  {vault.contractAddress}
+                  {sn.contractAddress}
                 </a>
               ) : (
-                <span className="mono addr">{vault.contractAddress}</span>
+                <span className="mono addr">{sn.contractAddress}</span>
               );
             })()}
           </span>
         ) : (
           <span>no contract configured</span>
         )}
+        {sn.wrapperColorHex && (
+          <span className="footer-token">
+            {sn.tokenSymbol ?? 'sNight'} ({sn.tokenName ?? 'Shielded Night'}){' '}
+            <span className="mono addr">{sn.wrapperColorHex}</span>
+          </span>
+        )}
         <a
           className="footer-link"
-          href="https://github.com/effectstream/night-vault-shielded"
+          href="https://github.com/effectstream/shielded-night"
           target="_blank"
           rel="noreferrer noopener"
         >
-          ↗ github.com/effectstream/night-vault-shielded
+          ↗ github.com/effectstream/shielded-night
         </a>
       </footer>
     </div>

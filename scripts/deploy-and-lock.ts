@@ -1,5 +1,5 @@
 /**
- * Deploy ConvertVault from THIS repo's compiled build (src/managed), then LOCK
+ * Deploy ShieldedNight from THIS repo's compiled build (src/managed), then LOCK
  * it: dissolve the maintenance committee so the contract can never be upgraded
  * again. This is a ONE-WAY door — a locked contract's circuits still run, but
  * no verifier key or rule can ever be changed. Use for an immutable release.
@@ -21,7 +21,7 @@ import { mnemonicToSeedSync } from '@scure/bip39';
 import { isEnvName, networkFor, type EnvName, GENESIS_MINT_SEED } from '../test/support/network.js';
 import { awaitWalletReady, buildWallet, DEFAULT_RESTORED_SYNC_TIMEOUT_MS } from '../test/support/wallet-builder.js';
 import { setupContract } from '../test/support/setup-contract.js';
-import { DEPLOY_ARGS, factory } from '../test/support/convert-vault.js';
+import { DEPLOY_ARGS, factory } from '../test/support/shielded-night.js';
 import { lockContract, readAuthority } from '../test/support/governance.js';
 
 /**
@@ -86,7 +86,7 @@ async function main() {
       );
     }
 
-    console.log('\n✅ deployed + LOCKED ConvertVault (permanently non-upgradeable)');
+    console.log('\n✅ deployed + LOCKED ShieldedNight (permanently non-upgradeable)');
     console.log(`   address: ${address}`);
     console.log(`   authority: committee=${after.committeeSize} threshold=${after.threshold} counter=${after.counter}`);
     console.log(`\nPaste into frontend/.env:`);

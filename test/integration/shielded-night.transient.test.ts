@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import * as vault from '../support/convert-vault.js';
+import * as contract from '../support/shielded-night.js';
 import { describeContract } from '../support/describe-contract.js';
 import type { WalletContext } from '../support/wallet-builder.js';
 import {
@@ -46,31 +46,31 @@ const probeWalletView = async (
   }
 };
 
-describe('convert-vault — sendImmediateShielded transient variant', () => {
-  describeContract(vault.factory, (ctx) => {
+describe('shielded-night — sendImmediateShielded transient variant', () => {
+  describeContract(contract.factory, (ctx) => {
     test(
       'full burn: transaction applies, credit is exact, wallet view measured',
       async () => {
         const c = ctx();
-        const deployed = await c.deployFresh([...vault.DEPLOY_ARGS]);
-        const colorHex = tokenColorHex((await vault.tokenColor(deployed)).private.result);
+        const deployed = await c.deployFresh([...contract.DEPLOY_ARGS]);
+        const colorHex = tokenColorHex((await contract.tokenColor(deployed)).private.result);
         const me = await getCoinPublicKey(c.walletCtx);
         const mintSecret = randomBytes32();
         const burnSecret = randomBytes32();
 
         // Mint a wrapper coin the normal way.
-        await vault.depositUnshielded(deployed, mintSecret, N);
+        await contract.depositUnshielded(deployed, mintSecret, N);
         const coin = (
-          await vault.withdrawShielded(deployed, mintSecret, N, me, randomBytes32())
+          await contract.withdrawShielded(deployed, mintSecret, N, me, randomBytes32())
         ).private.result;
         await waitForShieldedBalance(c.walletCtx.wallet, colorHex, (b) => b >= N);
 
         // Q1+Q2: full burn through the transient path.
         const res = (
-          await vault.depositShieldedWithChange(deployed, burnSecret, coin, N, vault.leftCoinPublicKey(me.bytes))
+          await contract.depositShieldedWithChange(deployed, burnSecret, coin, N, contract.leftCoinPublicKey(me.bytes))
         ).private.result;
         expect(res.is_some).toBe(false); // no change on a full burn
-        expect((await vault.getBalance(deployed, burnSecret)).private.result).toBe(N);
+        expect((await contract.getBalance(deployed, burnSecret)).private.result).toBe(N);
 
         // Q3: does the SDK wallet see the coin as spent?
         const view = await probeWalletView(c.walletCtx, colorHex, 0n);
@@ -84,40 +84,40 @@ describe('convert-vault — sendImmediateShielded transient variant', () => {
       'partial burn: exact change is returned, spendable, and nothing is lost',
       async () => {
         const c = ctx();
-        const deployed = await c.deployFresh([...vault.DEPLOY_ARGS]);
-        const colorHex = tokenColorHex((await vault.tokenColor(deployed)).private.result);
+        const deployed = await c.deployFresh([...contract.DEPLOY_ARGS]);
+        const colorHex = tokenColorHex((await contract.tokenColor(deployed)).private.result);
         const me = await getCoinPublicKey(c.walletCtx);
         const mintSecret = randomBytes32();
         const burnSecret = randomBytes32();
         const changeSecret = randomBytes32();
         const BURN = N / 4n;
 
-        await vault.depositUnshielded(deployed, mintSecret, N);
+        await contract.depositUnshielded(deployed, mintSecret, N);
         const coin = (
-          await vault.withdrawShielded(deployed, mintSecret, N, me, randomBytes32())
+          await contract.withdrawShielded(deployed, mintSecret, N, me, randomBytes32())
         ).private.result;
         await waitForShieldedBalance(c.walletCtx.wallet, colorHex, (b) => b >= N);
 
         // Partial burn: credit BURN, change N - BURN refunded to us.
         const res = (
-          await vault.depositShieldedWithChange(deployed, burnSecret, coin, BURN, vault.leftCoinPublicKey(me.bytes))
+          await contract.depositShieldedWithChange(deployed, burnSecret, coin, BURN, contract.leftCoinPublicKey(me.bytes))
         ).private.result;
         expect(res.is_some).toBe(true);
         const change = res.value;
         expect(change.value).toBe(N - BURN);
         expect(tokenColorHex(change.color)).toBe(colorHex);
-        expect((await vault.getBalance(deployed, burnSecret)).private.result).toBe(BURN);
+        expect((await contract.getBalance(deployed, burnSecret)).private.result).toBe(BURN);
 
         // The change coin is REAL: spend it through the plain deposit path.
         // (Contract-sent coins carry no ciphertext — this returned struct is
         // the only recoverable copy, so spendability is the loss-safety proof.)
-        await vault.depositShielded(deployed, changeSecret, change);
-        expect((await vault.getBalance(deployed, changeSecret)).private.result).toBe(N - BURN);
+        await contract.depositShielded(deployed, changeSecret, change);
+        expect((await contract.getBalance(deployed, changeSecret)).private.result).toBe(N - BURN);
 
         // Conservation: BURN + (N - BURN) credited, original N debited once.
         const total =
-          (await vault.getBalance(deployed, burnSecret)).private.result +
-          (await vault.getBalance(deployed, changeSecret)).private.result;
+          (await contract.getBalance(deployed, burnSecret)).private.result +
+          (await contract.getBalance(deployed, changeSecret)).private.result;
         expect(total).toBe(N);
 
         // Q3: wallet should end at zero wrapper (coin spent, change also spent).

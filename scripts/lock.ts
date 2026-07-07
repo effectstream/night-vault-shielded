@@ -1,5 +1,5 @@
 /**
- * LOCK an already-deployed ConvertVault: dissolve its maintenance committee so
+ * LOCK an already-deployed ShieldedNight: dissolve its maintenance committee so
  * the contract can never be upgraded again (empty committee, threshold 1). This
  * is a ONE-WAY door — the circuits keep running, but no verifier key or rule can
  * ever change. Unlike scripts/deploy-and-lock.ts this does NOT deploy; it locks
@@ -33,7 +33,7 @@ import { mnemonicToSeedSync } from '@scure/bip39';
 import { isEnvName, networkFor, type EnvName, GENESIS_MINT_SEED } from '../test/support/network.js';
 import { awaitWalletReady, buildWallet, DEFAULT_RESTORED_SYNC_TIMEOUT_MS } from '../test/support/wallet-builder.js';
 import { setupContract } from '../test/support/setup-contract.js';
-import { factory } from '../test/support/convert-vault.js';
+import { factory } from '../test/support/shielded-night.js';
 import { lockContract, readAuthority } from '../test/support/governance.js';
 
 function resolveSeed(env: EnvName): string {

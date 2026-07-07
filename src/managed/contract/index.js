@@ -233,7 +233,7 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('name',
                                      'argument 1 (as invoked from Typescript)',
-                                     'convert-vault.compact line 116 char 1',
+                                     'shielded-night.compact line 116 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
@@ -256,7 +256,7 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('symbol',
                                      'argument 1 (as invoked from Typescript)',
-                                     'convert-vault.compact line 122 char 1',
+                                     'shielded-night.compact line 122 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
@@ -279,7 +279,7 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('decimals',
                                      'argument 1 (as invoked from Typescript)',
-                                     'convert-vault.compact line 128 char 1',
+                                     'shielded-night.compact line 128 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
@@ -302,7 +302,7 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('tokenColor',
                                      'argument 1 (as invoked from Typescript)',
-                                     'convert-vault.compact line 134 char 1',
+                                     'shielded-night.compact line 134 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
@@ -327,21 +327,21 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('depositUnshielded',
                                      'argument 1 (as invoked from Typescript)',
-                                     'convert-vault.compact line 202 char 1',
+                                     'shielded-night.compact line 202 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(secret_0.buffer instanceof ArrayBuffer && secret_0.BYTES_PER_ELEMENT === 1 && secret_0.length === 32)) {
           __compactRuntime.typeError('depositUnshielded',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'convert-vault.compact line 202 char 1',
+                                     'shielded-night.compact line 202 char 1',
                                      'Bytes<32>',
                                      secret_0)
         }
         if (!(typeof(amount_0) === 'bigint' && amount_0 >= 0n && amount_0 <= 18446744073709551615n)) {
           __compactRuntime.typeError('depositUnshielded',
                                      'argument 2 (argument 3 as invoked from Typescript)',
-                                     'convert-vault.compact line 202 char 1',
+                                     'shielded-night.compact line 202 char 1',
                                      'Uint<0..18446744073709551616>',
                                      amount_0)
         }
@@ -374,35 +374,35 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('depositShielded_notWorking',
                                      'argument 1 (as invoked from Typescript)',
-                                     'convert-vault.compact line 231 char 1',
+                                     'shielded-night.compact line 231 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(secret_0.buffer instanceof ArrayBuffer && secret_0.BYTES_PER_ELEMENT === 1 && secret_0.length === 32)) {
           __compactRuntime.typeError('depositShielded_notWorking',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'convert-vault.compact line 231 char 1',
+                                     'shielded-night.compact line 231 char 1',
                                      'Bytes<32>',
                                      secret_0)
         }
         if (!(typeof(coin_0) === 'object' && coin_0.nonce.buffer instanceof ArrayBuffer && coin_0.nonce.BYTES_PER_ELEMENT === 1 && coin_0.nonce.length === 32 && coin_0.color.buffer instanceof ArrayBuffer && coin_0.color.BYTES_PER_ELEMENT === 1 && coin_0.color.length === 32 && typeof(coin_0.value) === 'bigint' && coin_0.value >= 0n && coin_0.value <= 340282366920938463463374607431768211455n)) {
           __compactRuntime.typeError('depositShielded_notWorking',
                                      'argument 2 (argument 3 as invoked from Typescript)',
-                                     'convert-vault.compact line 231 char 1',
+                                     'shielded-night.compact line 231 char 1',
                                      'struct ShieldedCoinInfo<nonce: Bytes<32>, color: Bytes<32>, value: Uint<0..340282366920938463463374607431768211456>>',
                                      coin_0)
         }
         if (!(typeof(amount_0) === 'bigint' && amount_0 >= 0n && amount_0 <= 340282366920938463463374607431768211455n)) {
           __compactRuntime.typeError('depositShielded_notWorking',
                                      'argument 3 (argument 4 as invoked from Typescript)',
-                                     'convert-vault.compact line 231 char 1',
+                                     'shielded-night.compact line 231 char 1',
                                      'Uint<0..340282366920938463463374607431768211456>',
                                      amount_0)
         }
         if (!(typeof(refundTo_0) === 'object' && typeof(refundTo_0.is_left) === 'boolean' && typeof(refundTo_0.left) === 'object' && refundTo_0.left.bytes.buffer instanceof ArrayBuffer && refundTo_0.left.bytes.BYTES_PER_ELEMENT === 1 && refundTo_0.left.bytes.length === 32 && typeof(refundTo_0.right) === 'object' && refundTo_0.right.bytes.buffer instanceof ArrayBuffer && refundTo_0.right.bytes.BYTES_PER_ELEMENT === 1 && refundTo_0.right.bytes.length === 32)) {
           __compactRuntime.typeError('depositShielded_notWorking',
                                      'argument 4 (argument 5 as invoked from Typescript)',
-                                     'convert-vault.compact line 231 char 1',
+                                     'shielded-night.compact line 231 char 1',
                                      'struct Either<is_left: Boolean, left: struct ZswapCoinPublicKey<bytes: Bytes<32>>, right: struct ContractAddress<bytes: Bytes<32>>>',
                                      refundTo_0)
         }
@@ -435,21 +435,21 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('depositShielded',
                                      'argument 1 (as invoked from Typescript)',
-                                     'convert-vault.compact line 268 char 1',
+                                     'shielded-night.compact line 268 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(secret_0.buffer instanceof ArrayBuffer && secret_0.BYTES_PER_ELEMENT === 1 && secret_0.length === 32)) {
           __compactRuntime.typeError('depositShielded',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'convert-vault.compact line 268 char 1',
+                                     'shielded-night.compact line 268 char 1',
                                      'Bytes<32>',
                                      secret_0)
         }
         if (!(typeof(coin_0) === 'object' && coin_0.nonce.buffer instanceof ArrayBuffer && coin_0.nonce.BYTES_PER_ELEMENT === 1 && coin_0.nonce.length === 32 && coin_0.color.buffer instanceof ArrayBuffer && coin_0.color.BYTES_PER_ELEMENT === 1 && coin_0.color.length === 32 && typeof(coin_0.value) === 'bigint' && coin_0.value >= 0n && coin_0.value <= 340282366920938463463374607431768211455n)) {
           __compactRuntime.typeError('depositShielded',
                                      'argument 2 (argument 3 as invoked from Typescript)',
-                                     'convert-vault.compact line 268 char 1',
+                                     'shielded-night.compact line 268 char 1',
                                      'struct ShieldedCoinInfo<nonce: Bytes<32>, color: Bytes<32>, value: Uint<0..340282366920938463463374607431768211456>>',
                                      coin_0)
         }
@@ -481,28 +481,28 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('withdrawUnshielded',
                                      'argument 1 (as invoked from Typescript)',
-                                     'convert-vault.compact line 300 char 1',
+                                     'shielded-night.compact line 300 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(secret_0.buffer instanceof ArrayBuffer && secret_0.BYTES_PER_ELEMENT === 1 && secret_0.length === 32)) {
           __compactRuntime.typeError('withdrawUnshielded',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'convert-vault.compact line 300 char 1',
+                                     'shielded-night.compact line 300 char 1',
                                      'Bytes<32>',
                                      secret_0)
         }
         if (!(typeof(amount_0) === 'bigint' && amount_0 >= 0n && amount_0 <= 18446744073709551615n)) {
           __compactRuntime.typeError('withdrawUnshielded',
                                      'argument 2 (argument 3 as invoked from Typescript)',
-                                     'convert-vault.compact line 300 char 1',
+                                     'shielded-night.compact line 300 char 1',
                                      'Uint<0..18446744073709551616>',
                                      amount_0)
         }
         if (!(typeof(recipient_0) === 'object' && typeof(recipient_0.is_left) === 'boolean' && typeof(recipient_0.left) === 'object' && recipient_0.left.bytes.buffer instanceof ArrayBuffer && recipient_0.left.bytes.BYTES_PER_ELEMENT === 1 && recipient_0.left.bytes.length === 32 && typeof(recipient_0.right) === 'object' && recipient_0.right.bytes.buffer instanceof ArrayBuffer && recipient_0.right.bytes.BYTES_PER_ELEMENT === 1 && recipient_0.right.bytes.length === 32)) {
           __compactRuntime.typeError('withdrawUnshielded',
                                      'argument 3 (argument 4 as invoked from Typescript)',
-                                     'convert-vault.compact line 300 char 1',
+                                     'shielded-night.compact line 300 char 1',
                                      'struct Either<is_left: Boolean, left: struct ContractAddress<bytes: Bytes<32>>, right: struct UserAddress<bytes: Bytes<32>>>',
                                      recipient_0)
         }
@@ -536,35 +536,35 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('withdrawShielded',
                                      'argument 1 (as invoked from Typescript)',
-                                     'convert-vault.compact line 348 char 1',
+                                     'shielded-night.compact line 348 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(secret_0.buffer instanceof ArrayBuffer && secret_0.BYTES_PER_ELEMENT === 1 && secret_0.length === 32)) {
           __compactRuntime.typeError('withdrawShielded',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'convert-vault.compact line 348 char 1',
+                                     'shielded-night.compact line 348 char 1',
                                      'Bytes<32>',
                                      secret_0)
         }
         if (!(typeof(amount_0) === 'bigint' && amount_0 >= 0n && amount_0 <= 18446744073709551615n)) {
           __compactRuntime.typeError('withdrawShielded',
                                      'argument 2 (argument 3 as invoked from Typescript)',
-                                     'convert-vault.compact line 348 char 1',
+                                     'shielded-night.compact line 348 char 1',
                                      'Uint<0..18446744073709551616>',
                                      amount_0)
         }
         if (!(typeof(recipient_0) === 'object' && recipient_0.bytes.buffer instanceof ArrayBuffer && recipient_0.bytes.BYTES_PER_ELEMENT === 1 && recipient_0.bytes.length === 32)) {
           __compactRuntime.typeError('withdrawShielded',
                                      'argument 3 (argument 4 as invoked from Typescript)',
-                                     'convert-vault.compact line 348 char 1',
+                                     'shielded-night.compact line 348 char 1',
                                      'struct ZswapCoinPublicKey<bytes: Bytes<32>>',
                                      recipient_0)
         }
         if (!(nonce_0.buffer instanceof ArrayBuffer && nonce_0.BYTES_PER_ELEMENT === 1 && nonce_0.length === 32)) {
           __compactRuntime.typeError('withdrawShielded',
                                      'argument 4 (argument 5 as invoked from Typescript)',
-                                     'convert-vault.compact line 348 char 1',
+                                     'shielded-night.compact line 348 char 1',
                                      'Bytes<32>',
                                      nonce_0)
         }
@@ -596,14 +596,14 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('getBalance',
                                      'argument 1 (as invoked from Typescript)',
-                                     'convert-vault.compact line 375 char 1',
+                                     'shielded-night.compact line 375 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(secret_0.buffer instanceof ArrayBuffer && secret_0.BYTES_PER_ELEMENT === 1 && secret_0.length === 32)) {
           __compactRuntime.typeError('getBalance',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'convert-vault.compact line 375 char 1',
+                                     'shielded-night.compact line 375 char 1',
                                      'Bytes<32>',
                                      secret_0)
         }
@@ -632,28 +632,28 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('convertToShielded',
                                      'argument 1 (as invoked from Typescript)',
-                                     'convert-vault.compact line 401 char 1',
+                                     'shielded-night.compact line 401 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(typeof(amount_0) === 'bigint' && amount_0 >= 0n && amount_0 <= 18446744073709551615n)) {
           __compactRuntime.typeError('convertToShielded',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'convert-vault.compact line 401 char 1',
+                                     'shielded-night.compact line 401 char 1',
                                      'Uint<0..18446744073709551616>',
                                      amount_0)
         }
         if (!(typeof(recipient_0) === 'object' && recipient_0.bytes.buffer instanceof ArrayBuffer && recipient_0.bytes.BYTES_PER_ELEMENT === 1 && recipient_0.bytes.length === 32)) {
           __compactRuntime.typeError('convertToShielded',
                                      'argument 2 (argument 3 as invoked from Typescript)',
-                                     'convert-vault.compact line 401 char 1',
+                                     'shielded-night.compact line 401 char 1',
                                      'struct ZswapCoinPublicKey<bytes: Bytes<32>>',
                                      recipient_0)
         }
         if (!(nonce_0.buffer instanceof ArrayBuffer && nonce_0.BYTES_PER_ELEMENT === 1 && nonce_0.length === 32)) {
           __compactRuntime.typeError('convertToShielded',
                                      'argument 3 (argument 4 as invoked from Typescript)',
-                                     'convert-vault.compact line 401 char 1',
+                                     'shielded-night.compact line 401 char 1',
                                      'Bytes<32>',
                                      nonce_0)
         }
@@ -685,21 +685,21 @@ export class Contract {
         if (!(typeof(contextOrig_0) === 'object' && contextOrig_0.currentQueryContext != undefined)) {
           __compactRuntime.typeError('convertToUnshielded',
                                      'argument 1 (as invoked from Typescript)',
-                                     'convert-vault.compact line 436 char 1',
+                                     'shielded-night.compact line 436 char 1',
                                      'CircuitContext',
                                      contextOrig_0)
         }
         if (!(typeof(coin_0) === 'object' && coin_0.nonce.buffer instanceof ArrayBuffer && coin_0.nonce.BYTES_PER_ELEMENT === 1 && coin_0.nonce.length === 32 && coin_0.color.buffer instanceof ArrayBuffer && coin_0.color.BYTES_PER_ELEMENT === 1 && coin_0.color.length === 32 && typeof(coin_0.value) === 'bigint' && coin_0.value >= 0n && coin_0.value <= 340282366920938463463374607431768211455n)) {
           __compactRuntime.typeError('convertToUnshielded',
                                      'argument 1 (argument 2 as invoked from Typescript)',
-                                     'convert-vault.compact line 436 char 1',
+                                     'shielded-night.compact line 436 char 1',
                                      'struct ShieldedCoinInfo<nonce: Bytes<32>, color: Bytes<32>, value: Uint<0..340282366920938463463374607431768211456>>',
                                      coin_0)
         }
         if (!(typeof(recipient_0) === 'object' && typeof(recipient_0.is_left) === 'boolean' && typeof(recipient_0.left) === 'object' && recipient_0.left.bytes.buffer instanceof ArrayBuffer && recipient_0.left.bytes.BYTES_PER_ELEMENT === 1 && recipient_0.left.bytes.length === 32 && typeof(recipient_0.right) === 'object' && recipient_0.right.bytes.buffer instanceof ArrayBuffer && recipient_0.right.bytes.BYTES_PER_ELEMENT === 1 && recipient_0.right.bytes.length === 32)) {
           __compactRuntime.typeError('convertToUnshielded',
                                      'argument 2 (argument 3 as invoked from Typescript)',
-                                     'convert-vault.compact line 436 char 1',
+                                     'shielded-night.compact line 436 char 1',
                                      'struct Either<is_left: Boolean, left: struct ContractAddress<bytes: Bytes<32>>, right: struct UserAddress<bytes: Bytes<32>>>',
                                      recipient_0)
         }
@@ -770,7 +770,7 @@ export class Contract {
     if (!(typeof(decimals__0) === 'bigint' && decimals__0 >= 0n && decimals__0 <= 255n)) {
       __compactRuntime.typeError('Contract state constructor',
                                  'argument 3 (argument 4 as invoked from Typescript)',
-                                 'convert-vault.compact line 106 char 1',
+                                 'shielded-night.compact line 106 char 1',
                                  'Uint<0..256>',
                                  decimals__0)
     }
@@ -1415,7 +1415,7 @@ export class Contract {
     return result_0;
   }
   _wrapDomain_0() {
-    return new Uint8Array([110, 105, 103, 104, 116, 45, 118, 97, 117, 108, 116, 58, 115, 104, 105, 101, 108, 100, 101, 100, 45, 119, 114, 97, 112, 112, 101, 114, 0, 0, 0, 0]);
+    return new Uint8Array([115, 104, 105, 101, 108, 100, 101, 100, 45, 110, 105, 103, 104, 116, 58, 119, 114, 97, 112, 112, 101, 114, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   }
   _wrapColor_0(context, partialProofData) {
     return this._tokenType_0(this._wrapDomain_0(),
@@ -1478,7 +1478,7 @@ export class Contract {
     return this._wrapColor_0(context, partialProofData);
   }
   _getBalanceKey_0(secret_0) {
-    return this._persistentHash_0([new Uint8Array([110, 105, 103, 104, 116, 45, 118, 97, 117, 108, 116, 58, 98, 97, 108, 97, 110, 99, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+    return this._persistentHash_0([new Uint8Array([115, 104, 105, 101, 108, 100, 101, 100, 45, 110, 105, 103, 104, 116, 58, 98, 97, 108, 97, 110, 99, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
                                    secret_0]);
   }
   _creditKey_0(context, partialProofData, balanceKey_0, amount_0) {
@@ -1521,7 +1521,7 @@ export class Contract {
     }
     const tmp_1 = ((t1) => {
                     if (t1 > 340282366920938463463374607431768211455n) {
-                      throw new __compactRuntime.CompactError('convert-vault.compact line 165 char 31: cast from Field or Uint value to smaller Uint value failed: ' + t1 + ' is greater than 340282366920938463463374607431768211455');
+                      throw new __compactRuntime.CompactError('shielded-night.compact line 165 char 31: cast from Field or Uint value to smaller Uint value failed: ' + t1 + ' is greater than 340282366920938463463374607431768211455');
                     }
                     return t1;
                   })(_descriptor_1.fromValue(__compactRuntime.queryLedgerState(context,
@@ -1650,7 +1650,7 @@ export class Contract {
     __compactRuntime.assert(this._equal_4(c_0.color,
                                           this._wrapColor_0(context,
                                                             partialProofData)),
-                            "not this vault's shielded wrapper");
+                            "not this contract's shielded wrapper");
     const amt_0 = amount_0;
     __compactRuntime.assert(amt_0 > 0n, 'amount must be positive');
     __compactRuntime.assert(amt_0 <= c_0.value, 'amount exceeds coin value');
@@ -1683,7 +1683,7 @@ export class Contract {
     __compactRuntime.assert(this._equal_5(c_0.color,
                                           this._wrapColor_0(context,
                                                             partialProofData)),
-                            "not this vault's shielded wrapper");
+                            "not this contract's shielded wrapper");
     this._receiveShielded_0(context, partialProofData, c_0);
     this._creditKey_0(context,
                       partialProofData,
@@ -1787,7 +1787,7 @@ export class Contract {
     __compactRuntime.assert(this._equal_10(c_0.color,
                                            this._wrapColor_0(context,
                                                              partialProofData)),
-                            "not this vault's shielded wrapper");
+                            "not this contract's shielded wrapper");
     __compactRuntime.assert(recipient_0.is_left ?
                             !this._equal_11({ bytes: new Uint8Array(32) },
                                             recipient_0.left)
@@ -1943,7 +1943,7 @@ export function ledger(stateOrChargedState) {
         if (!(key_0.buffer instanceof ArrayBuffer && key_0.BYTES_PER_ELEMENT === 1 && key_0.length === 32)) {
           __compactRuntime.typeError('member',
                                      'argument 1',
-                                     'convert-vault.compact line 48 char 1',
+                                     'shielded-night.compact line 48 char 1',
                                      'Bytes<32>',
                                      key_0)
         }
@@ -1972,7 +1972,7 @@ export function ledger(stateOrChargedState) {
         if (!(key_0.buffer instanceof ArrayBuffer && key_0.BYTES_PER_ELEMENT === 1 && key_0.length === 32)) {
           __compactRuntime.typeError('lookup',
                                      'argument 1',
-                                     'convert-vault.compact line 48 char 1',
+                                     'shielded-night.compact line 48 char 1',
                                      'Bytes<32>',
                                      key_0)
         }

@@ -1,25 +1,25 @@
 import { CompiledContract, type ProvableCircuitId } from '@midnight-ntwrk/compact-js';
 import type { MidnightProviders } from '@midnight-ntwrk/midnight-js/types';
-// Compiled ConvertVault artifacts live in the repo root's src/managed.
-import * as ConvertVault from '../../../src/managed/contract/index.js';
+// Compiled ShieldedNight artifacts live in the repo root's src/managed.
+import * as ShieldedNight from '../../../src/managed/contract/index.js';
 
-export type ConvertVaultContractT = ConvertVault.Contract<undefined>;
-export type ConvertVaultCircuits = ProvableCircuitId<ConvertVaultContractT>;
-export type ConvertVaultProviders = MidnightProviders<ConvertVaultCircuits>;
-export type ConvertVaultLedger = ReturnType<typeof ConvertVault.ledger>;
+export type ShieldedNightContractT = ShieldedNight.Contract<undefined>;
+export type ShieldedNightCircuits = ProvableCircuitId<ShieldedNightContractT>;
+export type ShieldedNightProviders = MidnightProviders<ShieldedNightCircuits>;
+export type ShieldedNightLedger = ReturnType<typeof ShieldedNight.ledger>;
 
-export const ledger = ConvertVault.ledger;
+export const ledger = ShieldedNight.ledger;
 
 /** Served path (see vite.config `viteStaticCopy`) for prover/verifier keys + zkir. */
-export const ZK_CONFIG_CONTRACT_NAME = 'convert-vault';
+export const ZK_CONFIG_CONTRACT_NAME = 'shielded-night';
 
 /**
  * The compiled contract handle midnight-js needs for deploy/find/callTx. No
  * witnesses (the secret is a circuit argument), so vacant witnesses.
  */
-export const CompiledConvertVault = CompiledContract.make<ConvertVault.Contract>(
-  'ConvertVault',
-  ConvertVault.Contract,
+export const CompiledShieldedNight = CompiledContract.make<ShieldedNight.Contract>(
+  'ShieldedNight',
+  ShieldedNight.Contract,
 ).pipe(
   CompiledContract.withVacantWitnesses,
   CompiledContract.withCompiledFileAssets(`./contract/compiled/${ZK_CONFIG_CONTRACT_NAME}`),

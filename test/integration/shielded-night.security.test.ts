@@ -1,6 +1,6 @@
 import * as ledgerV8 from '@midnight-ntwrk/ledger-v8';
 import { describe, expect, test } from 'vitest';
-import * as vault from '../support/convert-vault.js';
+import * as contract from '../support/shielded-night.js';
 import { describeContract, describeContractWithWallets } from '../support/describe-contract.js';
 import { tryCall } from '../support/smoke-helpers.js';
 import {
@@ -32,27 +32,27 @@ const attemptFails = async (fn: () => Promise<unknown>): Promise<void> => {
   expect(outcome.ok, 'expected the transaction to be rejected').toBe(false);
 };
 
-/** Sum of all credit balances in the vault's ledger map. */
+/** Sum of all credit balances in the contract's ledger map. */
 const sumCredits = async (
-  providers: vault.ConvertVaultProviders,
+  providers: contract.ShieldedNightProviders,
   address: string,
 ): Promise<bigint> => {
-  const state = await vault.factory.readLedger(providers, address);
+  const state = await contract.factory.readLedger(providers, address);
   expect(state).not.toBeNull();
   let sum = 0n;
   for (const [, balance] of state!.balances) sum += balance;
   return sum;
 };
 
-describe('convert-vault — security', () => {
-  describeContract(vault.factory, (ctx) => {
+describe('shielded-night — security', () => {
+  describeContract(contract.factory, (ctx) => {
     test(
       'forged wrapper coins cannot mint credit (never-minted, inflated, double-spent)',
       async () => {
         const c = ctx();
-        const deployed = await c.deployFresh([...vault.DEPLOY_ARGS]);
+        const deployed = await c.deployFresh([...contract.DEPLOY_ARGS]);
         const address = deployed.deployTxData.public.contractAddress;
-        const color = (await vault.tokenColor(deployed)).private.result;
+        const color = (await contract.tokenColor(deployed)).private.result;
         const colorHex = tokenColorHex(color);
         const me = await getCoinPublicKey(c.walletCtx);
 
@@ -61,33 +61,33 @@ describe('convert-vault — security', () => {
         // transaction cannot balance.
         const thief = randomBytes32();
         await attemptFails(() =>
-          vault.depositShielded(deployed, thief, { nonce: randomBytes32(), color, value: N }),
+          contract.depositShielded(deployed, thief, { nonce: randomBytes32(), color, value: N }),
         );
         // The thief's key must not exist in the ledger at all.
-        const afterForged = await vault.factory.readLedger(c.providers, address);
+        const afterForged = await contract.factory.readLedger(c.providers, address);
         expect(afterForged?.balances.isEmpty()).toBe(true);
 
         // Mint a real wrapper coin to set up the next two vectors.
         const owner = randomBytes32();
-        await vault.depositUnshielded(deployed, owner, N);
+        await contract.depositUnshielded(deployed, owner, N);
         const coin = (
-          await vault.withdrawShielded(deployed, owner, N, me, randomBytes32())
+          await contract.withdrawShielded(deployed, owner, N, me, randomBytes32())
         ).private.result;
         await waitForShieldedBalance(c.walletCtx.wallet, colorHex, (b) => b >= N);
 
         // --- Vector 2: the real coin's nonce with an inflated value. The
         // commitment doesn't match any owned UTXO, so it cannot balance.
         await attemptFails(() =>
-          vault.depositShielded(deployed, thief, { ...coin, value: N * 2n }),
+          contract.depositShielded(deployed, thief, { ...coin, value: N * 2n }),
         );
 
         // --- Vector 3: double-burn. The genuine coin deposits once...
-        await vault.depositShielded(deployed, owner, coin);
-        expect((await vault.getBalance(deployed, owner)).private.result).toBe(N);
+        await contract.depositShielded(deployed, owner, coin);
+        expect((await contract.getBalance(deployed, owner)).private.result).toBe(N);
         await waitForShieldedBalance(c.walletCtx.wallet, colorHex, (b) => b === 0n);
         // ...and the second attempt with the same (now spent) coin fails.
-        await attemptFails(() => vault.depositShielded(deployed, owner, coin));
-        expect((await vault.getBalance(deployed, owner)).private.result).toBe(N);
+        await attemptFails(() => contract.depositShielded(deployed, owner, coin));
+        expect((await contract.getBalance(deployed, owner)).private.result).toBe(N);
 
         // Nothing in the attack sequence created credit out of thin air.
         expect(await sumCredits(c.providers, address)).toBe(N);
@@ -99,25 +99,25 @@ describe('convert-vault — security', () => {
       'nonce reuse cannot double-mint: the duplicate commitment is rejected',
       async () => {
         const c = ctx();
-        const deployed = await c.deployFresh([...vault.DEPLOY_ARGS]);
+        const deployed = await c.deployFresh([...contract.DEPLOY_ARGS]);
         const me = await getCoinPublicKey(c.walletCtx);
         const secret = randomBytes32();
         const nonce = randomBytes32();
 
-        await vault.depositUnshielded(deployed, secret, 2n * N);
+        await contract.depositUnshielded(deployed, secret, 2n * N);
 
         // First mint with `nonce` succeeds.
-        await vault.withdrawShielded(deployed, secret, N, me, nonce);
-        expect((await vault.getBalance(deployed, secret)).private.result).toBe(N);
+        await contract.withdrawShielded(deployed, secret, N, me, nonce);
+        expect((await contract.getBalance(deployed, secret)).private.result).toBe(N);
 
         // Same (value, recipient, nonce) => identical coin commitment => the
         // ledger rejects it. The debit must not survive the failed tx.
-        await attemptFails(() => vault.withdrawShielded(deployed, secret, N, me, nonce));
-        expect((await vault.getBalance(deployed, secret)).private.result).toBe(N);
+        await attemptFails(() => contract.withdrawShielded(deployed, secret, N, me, nonce));
+        expect((await contract.getBalance(deployed, secret)).private.result).toBe(N);
 
         // A fresh nonce withdraws the remainder normally.
-        await vault.withdrawShielded(deployed, secret, N, me, randomBytes32());
-        expect((await vault.getBalance(deployed, secret)).private.result).toBe(0n);
+        await contract.withdrawShielded(deployed, secret, N, me, randomBytes32());
+        expect((await contract.getBalance(deployed, secret)).private.result).toBe(0n);
       },
       10 * 60_000,
     );
@@ -126,11 +126,11 @@ describe('convert-vault — security', () => {
       'reserve invariant: locked NIGHT always equals credits + outstanding wrapper',
       async () => {
         const c = ctx();
-        const deployed = await c.deployFresh([...vault.DEPLOY_ARGS]);
+        const deployed = await c.deployFresh([...contract.DEPLOY_ARGS]);
         const address = deployed.deployTxData.public.contractAddress;
-        const colorHex = tokenColorHex((await vault.tokenColor(deployed)).private.result);
+        const colorHex = tokenColorHex((await contract.tokenColor(deployed)).private.result);
         const me = await getCoinPublicKey(c.walletCtx);
-        const myAddr = vault.rightUserAddress(getUserAddress(c.walletCtx).bytes);
+        const myAddr = contract.rightUserAddress(getUserAddress(c.walletCtx).bytes);
         const secret = randomBytes32();
         const night0 = await getNightBalance(c.walletCtx);
 
@@ -139,17 +139,17 @@ describe('convert-vault — security', () => {
         const RELEASED = 2n * N;
 
         // deposit 10, mint 4 as wrapper, release 2 as NIGHT.
-        await vault.depositUnshielded(deployed, secret, DEPOSIT);
-        await vault.withdrawShielded(deployed, secret, MINTED, me, randomBytes32());
+        await contract.depositUnshielded(deployed, secret, DEPOSIT);
+        await contract.withdrawShielded(deployed, secret, MINTED, me, randomBytes32());
         const wrapper = await waitForShieldedBalance(c.walletCtx.wallet, colorHex, (b) => b >= MINTED);
-        await vault.withdrawUnshielded(deployed, secret, RELEASED, myAddr);
+        await contract.withdrawUnshielded(deployed, secret, RELEASED, myAddr);
 
         // Ledger credits: 10 - 4 - 2 = 4. Wrapper outstanding: 4.
         const credits = await sumCredits(c.providers, address);
         expect(credits).toBe(DEPOSIT - MINTED - RELEASED);
         expect(wrapper).toBe(MINTED);
 
-        // The vault's NIGHT reserve backs both in full: locked == credits + wrapper.
+        // The contract's NIGHT reserve backs both in full: locked == credits + wrapper.
         // Measured from the wallet side: exactly (credits + wrapper) of our
         // NIGHT is locked in the contract, no more (nothing skimmed), no less
         // (fees are DUST, never NIGHT).
@@ -168,18 +168,18 @@ describe('convert-vault — security', () => {
         // Every acceptance decision is `receiveShielded`, enforced by the
         // ledger's coin-commitment set: only these on-chain tests can falsify it.
         const c = ctx();
-        const deployed = await c.deployFresh([...vault.DEPLOY_ARGS]);
+        const deployed = await c.deployFresh([...contract.DEPLOY_ARGS]);
         const address = deployed.deployTxData.public.contractAddress;
-        const color = (await vault.tokenColor(deployed)).private.result;
+        const color = (await contract.tokenColor(deployed)).private.result;
         const colorHex = tokenColorHex(color);
         const me = await getCoinPublicKey(c.walletCtx);
-        const myAddr = vault.rightUserAddress(getUserAddress(c.walletCtx).bytes);
+        const myAddr = contract.rightUserAddress(getUserAddress(c.walletCtx).bytes);
         const night0 = await getNightBalance(c.walletCtx);
 
         // --- Vector 1: a coin that was never minted. receiveShielded claims
         // it, but no wallet can supply the UTXO, so the tx cannot balance.
         await attemptFails(() =>
-          vault.convertToUnshielded(
+          contract.convertToUnshielded(
             deployed,
             { nonce: randomBytes32(), color, value: N },
             myAddr,
@@ -188,36 +188,36 @@ describe('convert-vault — security', () => {
 
         // Fund the reserve with a real atomic convert (locks N, mints N).
         const nonce = randomBytes32();
-        const coin = (await vault.convertToShielded(deployed, N, me, nonce)).private.result;
+        const coin = (await contract.convertToShielded(deployed, N, me, nonce)).private.result;
         await waitForShieldedBalance(c.walletCtx.wallet, colorHex, (b) => b >= N);
 
         // --- Vector 2: the real coin's nonce with an inflated value. The
         // commitment doesn't match any owned UTXO, so it cannot balance.
         await attemptFails(() =>
-          vault.convertToUnshielded(deployed, { ...coin, value: 2n * N }, myAddr),
+          contract.convertToUnshielded(deployed, { ...coin, value: 2n * N }, myAddr),
         );
 
         // --- Vector 3: double-spend. The genuine coin converts back once...
-        await vault.convertToUnshielded(deployed, coin, myAddr);
+        await contract.convertToUnshielded(deployed, coin, myAddr);
         await waitForShieldedBalance(c.walletCtx.wallet, colorHex, (b) => b === 0n);
         expect(await waitForUnshieldedBalance(c.walletCtx.wallet, NIGHT_HEX, (b) => b >= night0)).toBe(night0);
         // ...and a second release against the same (now spent) coin fails.
-        await attemptFails(() => vault.convertToUnshielded(deployed, coin, myAddr));
+        await attemptFails(() => contract.convertToUnshielded(deployed, coin, myAddr));
 
         // --- Vector 4: replay-mint. Re-minting with the SAME nonce reproduces
         // the spent coin's commitment; the append-only commitment set rejects
         // it even though the original coin is long spent.
-        await attemptFails(() => vault.convertToShielded(deployed, N, me, nonce));
+        await attemptFails(() => contract.convertToShielded(deployed, N, me, nonce));
 
-        // The vault itself is undamaged: a fresh nonce round-trips normally.
-        const coin2 = (await vault.convertToShielded(deployed, N, me, randomBytes32())).private
+        // The contract itself is undamaged: a fresh nonce round-trips normally.
+        const coin2 = (await contract.convertToShielded(deployed, N, me, randomBytes32())).private
           .result;
         await waitForShieldedBalance(c.walletCtx.wallet, colorHex, (b) => b >= N);
-        await vault.convertToUnshielded(deployed, coin2, myAddr);
+        await contract.convertToUnshielded(deployed, coin2, myAddr);
         await waitForShieldedBalance(c.walletCtx.wallet, colorHex, (b) => b === 0n);
 
         // Nothing in the attack sequence created credit or skimmed the reserve.
-        const state = await vault.factory.readLedger(c.providers, address);
+        const state = await contract.factory.readLedger(c.providers, address);
         expect(state?.balances.isEmpty()).toBe(true);
         expect(await waitForUnshieldedBalance(c.walletCtx.wallet, NIGHT_HEX, (b) => b >= night0)).toBe(night0);
       },
@@ -227,9 +227,9 @@ describe('convert-vault — security', () => {
 });
 
 describe.skipIf((process.env.MN_ENV ?? 'undeployed') !== 'undeployed')(
-  'convert-vault — security, multi-wallet',
+  'shielded-night — security, multi-wallet',
   () => {
-    describeContractWithWallets(vault.factory, ['alice', 'bob'] as const, (ctx) => {
+    describeContractWithWallets(contract.factory, ['alice', 'bob'] as const, (ctx) => {
       test(
         "bob cannot burn alice's wrapper coin to credit himself",
         async () => {
@@ -237,15 +237,15 @@ describe.skipIf((process.env.MN_ENV ?? 'undeployed') !== 'undeployed')(
           const secretA = randomBytes32();
           const secretB = randomBytes32();
 
-          const deployed = await alice.deployFresh([...vault.DEPLOY_ARGS]);
+          const deployed = await alice.deployFresh([...contract.DEPLOY_ARGS]);
           const address = deployed.deployTxData.public.contractAddress;
           const bobView = await bob.connect(address);
-          const colorHex = tokenColorHex((await vault.tokenColor(deployed)).private.result);
+          const colorHex = tokenColorHex((await contract.tokenColor(deployed)).private.result);
 
           // Alice converts N into the wrapper; the coin belongs to her wallet.
-          await vault.depositUnshielded(deployed, secretA, N);
+          await contract.depositUnshielded(deployed, secretA, N);
           const aliceCoin = (
-            await vault.withdrawShielded(
+            await contract.withdrawShielded(
               deployed,
               secretA,
               N,
@@ -257,14 +257,14 @@ describe.skipIf((process.env.MN_ENV ?? 'undeployed') !== 'undeployed')(
 
           // Bob knows the coin's public info but does not own the UTXO: his
           // wallet cannot supply it, so the deposit cannot balance.
-          await attemptFails(() => vault.depositShielded(bobView, secretB, aliceCoin));
-          const state = await vault.factory.readLedger(bob.providers, address);
+          await attemptFails(() => contract.depositShielded(bobView, secretB, aliceCoin));
+          const state = await contract.factory.readLedger(bob.providers, address);
           expect(state?.balances.member(new Uint8Array(32))).toBe(false);
-          await attemptFails(() => vault.getBalance(bobView, secretB)); // no credit key created
+          await attemptFails(() => contract.getBalance(bobView, secretB)); // no credit key created
 
           // Alice's coin is untouched by bob's attempt: she burns it herself.
-          await vault.depositShielded(deployed, secretA, aliceCoin);
-          expect((await vault.getBalance(deployed, secretA)).private.result).toBe(N);
+          await contract.depositShielded(deployed, secretA, aliceCoin);
+          expect((await contract.getBalance(deployed, secretA)).private.result).toBe(N);
         },
         10 * 60_000,
       );

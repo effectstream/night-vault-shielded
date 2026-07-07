@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 const dir = path.dirname(fileURLToPath(import.meta.url));
 
 // The compiled contract artifacts (prover/verifier keys, zkir) live in the
-// repo root's src/managed. Serve them under /contract/compiled/convert-vault
+// repo root's src/managed. Serve them under /contract/compiled/shielded-night
 // so FetchZkConfigProvider can fetch them at proving time.
 const managedSrc = path.resolve(dir, '..', 'src', 'managed');
 
@@ -34,7 +34,7 @@ export default defineConfig({
     react(),
     wasm(),
     viteStaticCopy({
-      targets: [{ src: managedSrc, dest: 'contract/compiled', rename: 'convert-vault' }],
+      targets: [{ src: managedSrc, dest: 'contract/compiled', rename: 'shielded-night' }],
     }),
     {
       // Dev-only diagnostic sink: the dApp POSTs the exact balanced tx hex here
@@ -64,7 +64,7 @@ export default defineConfig({
       configureServer(server) {
         server.middlewares.use((req, res, next) => {
           if (req.url?.startsWith('/contract/compiled/')) {
-            const rel = req.url.replace('/contract/compiled/convert-vault', '');
+            const rel = req.url.replace('/contract/compiled/shielded-night', '');
             const filePath = path.join(managedSrc, rel.split('?')[0]);
             if (!fs.existsSync(filePath)) {
               res.statusCode = 404;

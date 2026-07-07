@@ -7,7 +7,7 @@ import type { BlockHashConfig, BlockHeightConfig } from '@midnight-ntwrk/midnigh
 import type { ContractAddress } from '@midnight-ntwrk/ledger-v8';
 
 import { createWalletProvidersFromConnectedAPI } from './walletAdapter';
-import { type ConvertVaultCircuits, type ConvertVaultProviders, ZK_CONFIG_CONTRACT_NAME } from './contract';
+import { type ShieldedNightCircuits, type ShieldedNightProviders, ZK_CONFIG_CONTRACT_NAME } from './contract';
 
 export type ShieldedAddress = {
   shieldedAddress: string;
@@ -17,17 +17,17 @@ export type ShieldedAddress = {
 
 /**
  * Assemble the midnight-js provider suite from a connected wallet:
- * - zkConfig: fetched from the served /contract/compiled/convert-vault path
+ * - zkConfig: fetched from the served /contract/compiled/shielded-night path
  * - publicData: the wallet's indexer (with a post-block zswap-state refresh)
  * - proof: the WALLET's proving provider - the frontend never names a proof
  *   server (proverServerUri is deprecated in favor of getProvingProvider), so
  *   the wallet owns proving and this works on any deployment.
  * - wallet/midnight: the connected wallet (balance + submit)
- * - privateState: browser leveldb (empty for ConvertVault, but required)
+ * - privateState: browser leveldb (empty for ShieldedNight, but required)
  */
-export async function buildProviders(connectedAPI: ConnectedAPI): Promise<ConvertVaultProviders> {
+export async function buildProviders(connectedAPI: ConnectedAPI): Promise<ShieldedNightProviders> {
   const zkConfigBase = window.location.origin + '/contract/compiled/' + ZK_CONFIG_CONTRACT_NAME;
-  const zkConfigProvider = new FetchZkConfigProvider<ConvertVaultCircuits>(zkConfigBase, fetch.bind(window));
+  const zkConfigProvider = new FetchZkConfigProvider<ShieldedNightCircuits>(zkConfigBase, fetch.bind(window));
 
   const config = await connectedAPI.getConfiguration();
 
@@ -60,7 +60,7 @@ export async function buildProviders(connectedAPI: ConnectedAPI): Promise<Conver
   const { walletProvider, midnightProvider } = createWalletProvidersFromConnectedAPI(connectedAPI, shieldedAddress);
 
   const privateStateProvider = levelPrivateStateProvider({
-    privateStoragePasswordProvider: () => 'convert-vault-dapp-storage-password!',
+    privateStoragePasswordProvider: () => 'shielded-night-dapp-storage-password!',
     accountId: shieldedAddress.shieldedAddress,
   });
 
@@ -71,5 +71,5 @@ export async function buildProviders(connectedAPI: ConnectedAPI): Promise<Conver
     proofProvider,
     walletProvider,
     midnightProvider,
-  } as unknown as ConvertVaultProviders;
+  } as unknown as ShieldedNightProviders;
 }

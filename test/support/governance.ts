@@ -10,8 +10,8 @@ import {
 import { submitTx } from '@midnight-ntwrk/midnight-js/contracts';
 import { getNetworkId } from '@midnight-ntwrk/midnight-js/network-id';
 import { asContractAddress } from '@midnight-ntwrk/midnight-js/types';
-import { ConvertVaultContract } from '../../src/index.ts';
-import type { ConvertVaultProviders } from './convert-vault.js';
+import { ShieldedNightContract } from '../../src/index.ts';
+import type { ShieldedNightProviders } from './shielded-night.js';
 
 /**
  * Governance helpers for exercising the Contract Maintenance Authority (CMA) —
@@ -25,9 +25,9 @@ import type { ConvertVaultProviders } from './convert-vault.js';
  * but with a committee of `[]`.
  */
 
-/** Build the vault's CompiledContract, as the contract factory does internally. */
+/** Build the contract's CompiledContract, as the contract factory does internally. */
 export const buildCompiled = (zkConfigPath: string) =>
-  CompiledContract.make('convert-vault', ConvertVaultContract.Contract).pipe(
+  CompiledContract.make('shielded-night', ShieldedNightContract.Contract).pipe(
     CompiledContract.withVacantWitnesses,
     CompiledContract.withCompiledFileAssets(zkConfigPath),
   );
@@ -40,7 +40,7 @@ export interface AuthoritySnapshot {
 
 /** Read the on-chain maintenance authority for a contract. */
 export const readAuthority = async (
-  providers: ConvertVaultProviders,
+  providers: ShieldedNightProviders,
   address: string,
 ): Promise<AuthoritySnapshot> => {
   const state = await providers.publicDataProvider.queryContractState(address);
@@ -67,7 +67,7 @@ const ttlOneHour = (): Date => new Date(Date.now() + 60 * 60 * 1000);
  *   opposite of locked).
  */
 export const lockContract = async (
-  providers: ConvertVaultProviders,
+  providers: ShieldedNightProviders,
   address: string,
   threshold = 1,
 ): Promise<void> => {

@@ -4,7 +4,7 @@ pragma language_version >= 0.20;
 import CompactStandardLibrary;
 
 /**
- * @title ConvertVault
+ * @title ShieldedNight
  * @description A hash-keyed pool that converts native unshielded NIGHT into a
  * shielded wrapper token and back, in two single-domain steps. A depositor holds
  * a credit balance keyed by `hash(secret)`; depositing in either value domain adds
@@ -75,7 +75,7 @@ export sealed ledger _decimals: Uint<8>;
  * @return {Bytes<32>} - The wrapper domain separator.
  */
 circuit wrapDomain(): Bytes<32> {
-  return pad(32, "night-vault:shielded-wrapper");
+  return pad(32, "shielded-night:wrapper");
 }
 
 /**
@@ -144,7 +144,7 @@ export circuit tokenColor(): Bytes<32> { return wrapColor(); }
  * @return {Bytes<32>} - The public balance key `hash(secret)`.
  */
 circuit getBalanceKey(secret: Bytes<32>): Bytes<32> {
-  return disclose(persistentHash<Vector<2, Bytes<32>>>([pad(32, "night-vault:balance"), secret]));
+  return disclose(persistentHash<Vector<2, Bytes<32>>>([pad(32, "shielded-night:balance"), secret]));
 }
 
 /**
@@ -210,7 +210,7 @@ export circuit depositUnshielded(secret: Bytes<32>, amount: Uint<64>): [] {
  * @description Burns `amount` of a wrapper coin (shielded) and credits the caller's
  * balance by `amount`. First half of a shielded -> unshielded conversion.
  *
- * @notice Pure shielded. `coin` must be this vault's wrapper. `amount` is sent to the
+ * @notice Pure shielded. `coin` must be this contract's wrapper. `amount` is sent to the
  * shielded burn address; the remainder (`coin.value - amount`) is returned to
  * `refundTo` and echoed back as the return value. Because contract-sent coins carry
  * no ciphertext, that returned `ShieldedCoinInfo` is the only recoverable copy of the
@@ -219,7 +219,7 @@ export circuit depositUnshielded(secret: Bytes<32>, amount: Uint<64>): [] {
  * Requirements:
  *
  * - `coin.value` is greater than zero.
- * - `coin.color` is this vault's wrapper color.
+ * - `coin.color` is this contract's wrapper color.
  * - `0 < amount <= coin.value`.
  *
  * @param {Bytes<32>} secret - The depositor's secret; credits `hash(secret)`.
@@ -236,7 +236,7 @@ export circuit depositShielded_notWorking(
 ): Maybe<ShieldedCoinInfo> {
   const c = disclose(coin);
   assert(c.value > 0, "coin value must be positive");
-  assert(c.color == wrapColor(), "not this vault's shielded wrapper");
+  assert(c.color == wrapColor(), "not this contract's shielded wrapper");
 
   const amt = disclose(amount);
   assert(amt > 0, "amount must be positive");
@@ -271,7 +271,7 @@ export circuit depositShielded(
 ): Maybe<ShieldedCoinInfo> {
   const c = disclose(coin);
   assert(c.value > 0, "coin value must be positive");
-  assert(c.color == wrapColor(), "not this vault's shielded wrapper");
+  assert(c.color == wrapColor(), "not this contract's shielded wrapper");
   receiveShielded(c);
   creditKey(getBalanceKey(secret), c.value);
   return none<ShieldedCoinInfo>();
@@ -354,7 +354,7 @@ export circuit withdrawShielded(
   assert(amount > 0, "amount must be positive");
   // Minting to the zero key is minting to Midnight's burn address: the wrapper
   // would be unspendable while the debited credit and its backing NIGHT stay
-  // locked in the vault forever.
+  // locked in the contract forever.
   assert(!(default<ZswapCoinPublicKey> == recipient), "invalid recipient");
   const _amount = disclose(amount);
   debitKey(getBalanceKey(secret), _amount as Uint<128>);
@@ -427,7 +427,7 @@ export circuit convertToShielded(
  *
  * Requirements:
  * - `coin.value` is greater than zero.
- * - `coin.color` is this vault's wrapper color.
+ * - `coin.color` is this contract's wrapper color.
  * - `recipient` is not the zero address (burn).
  *
  * @param {ShieldedCoinInfo} coin - The wrapper coin to burn.
@@ -439,7 +439,7 @@ export circuit convertToUnshielded(
 ): [] {
   const c = disclose(coin);
   assert(c.value > 0, "coin value must be positive");
-  assert(c.color == wrapColor(), "not this vault's shielded wrapper");
+  assert(c.color == wrapColor(), "not this contract's shielded wrapper");
   assert(
     recipient.is_left
       ? !(default<ContractAddress> == recipient.left)

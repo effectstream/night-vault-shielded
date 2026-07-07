@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import type { VaultState } from '../hooks/useVault';
-import { errMsg } from '../hooks/useVault';
+import type { ShieldedNightState } from '../hooks/useShieldedNight';
+import { errMsg } from '../hooks/useShieldedNight';
 import { formatAmount, parseAmount } from '../lib/tokens';
 import { type Direction, runConvertToShielded, runConvertToUnshielded, type SwapStep } from '../lib/swap';
 
@@ -9,7 +9,7 @@ const TOKENS = {
   toUnshielded: { from: 'wNIGHT', to: 'NIGHT' },
 } as const;
 
-export function SwapCard({ vault }: { vault: VaultState }) {
+export function SwapCard({ sn }: { sn: ShieldedNightState }) {
   const [direction, setDirection] = useState<Direction>('toShielded');
   const [amount, setAmount] = useState('');
   const [busy, setBusy] = useState(false);
@@ -18,7 +18,7 @@ export function SwapCard({ vault }: { vault: VaultState }) {
   const [localErr, setLocalErr] = useState<string>();
 
   const { from, to } = TOKENS[direction];
-  const ready = vault.connected && !!vault.contractAddress;
+  const ready = sn.connected && !!sn.contractAddress;
 
   const flip = () => {
     setDirection((d) => (d === 'toShielded' ? 'toUnshielded' : 'toShielded'));
@@ -27,7 +27,7 @@ export function SwapCard({ vault }: { vault: VaultState }) {
 
   // Max = the wallet's balance in the "from" token: NIGHT for forward, wNIGHT
   // for reverse (the wallet funds the conversion + change during balancing).
-  const maxBase = direction === 'toShielded' ? (vault.balances?.nativeNight ?? 0n) : (vault.balances?.wrapper ?? 0n);
+  const maxBase = direction === 'toShielded' ? (sn.balances?.nativeNight ?? 0n) : (sn.balances?.wrapper ?? 0n);
   const onMax = () => {
     setLocalErr(undefined);
     setAmount(formatAmount(maxBase));
@@ -35,7 +35,7 @@ export function SwapCard({ vault }: { vault: VaultState }) {
 
   async function onSwap() {
     setLocalErr(undefined);
-    if (!vault.providers || !vault.contractAddress) return;
+    if (!sn.providers || !sn.contractAddress) return;
     let amt: bigint;
     try {
       amt = parseAmount(amount);
@@ -53,35 +53,35 @@ export function SwapCard({ vault }: { vault: VaultState }) {
           setStep(s);
           setStepLabel(label);
         },
-        onLog: vault.appendLog,
+        onLog: sn.appendLog,
       };
       if (direction === 'toShielded') {
         await runConvertToShielded(
           {
-            providers: vault.providers,
-            contractAddress: vault.contractAddress,
+            providers: sn.providers,
+            contractAddress: sn.contractAddress,
             amount: amt,
-            coinPublicKey: vault.coinPublicKey!,
+            coinPublicKey: sn.coinPublicKey!,
           },
           cb,
         );
       } else {
         await runConvertToUnshielded(
           {
-            providers: vault.providers,
-            contractAddress: vault.contractAddress,
+            providers: sn.providers,
+            contractAddress: sn.contractAddress,
             amount: amt,
-            unshieldedAddress: vault.unshieldedAddress!,
-            wrapperColorHex: vault.wrapperColorHex!,
+            unshieldedAddress: sn.unshieldedAddress!,
+            wrapperColorHex: sn.wrapperColorHex!,
           },
           cb,
         );
       }
-      await vault.refreshBalances();
+      await sn.refreshBalances();
       setAmount('');
     } catch (e) {
       setLocalErr(errMsg(e));
-      vault.appendLog('Swap error: ' + errMsg(e));
+      sn.appendLog('Swap error: ' + errMsg(e));
     } finally {
       setBusy(false);
       setTimeout(() => setStep(null), 1500);
@@ -135,7 +135,7 @@ export function SwapCard({ vault }: { vault: VaultState }) {
       {direction === 'toUnshielded' && (
         <p className="small muted" style={{ marginBottom: 0 }}>
           Converts wNIGHT back to NIGHT; the wallet selects coins and makes change. Available:{' '}
-          <b>{formatAmount(vault.balances?.wrapper ?? 0n)}</b> wNIGHT.
+          <b>{formatAmount(sn.balances?.wrapper ?? 0n)}</b> wNIGHT.
         </p>
       )}
 
@@ -153,8 +153,8 @@ export function SwapCard({ vault }: { vault: VaultState }) {
       </button>
       {!ready && (
         <p className="small muted" style={{ marginBottom: 0 }}>
-          {vault.connected
-            ? `No contract address configured for ${vault.networkKey}. Set VITE_CONTRACT_ADDRESS_${vault.networkKey.toUpperCase()} in .env.`
+          {sn.connected
+            ? `No contract address configured for ${sn.networkKey}. Set VITE_CONTRACT_ADDRESS_${sn.networkKey.toUpperCase()} in .env.`
             : 'Connect a wallet to swap.'}
         </p>
       )}

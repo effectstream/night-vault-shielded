@@ -1,28 +1,28 @@
 import { useState } from 'react';
-import type { VaultState } from '../hooks/useVault';
+import type { ShieldedNightState } from '../hooks/useShieldedNight';
 import { shortHex } from '../lib/connector';
 import { configuredNetworks, type NetworkOption } from '../lib/networks';
 
-export function WalletBar({ vault }: { vault: VaultState }) {
+export function WalletBar({ sn }: { sn: ShieldedNightState }) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const networks = configuredNetworks();
 
   const onConnectClick = () => {
-    if (vault.availableAPIs.length === 1) {
-      void vault.connect(vault.availableAPIs[0]);
+    if (sn.availableAPIs.length === 1) {
+      void sn.connect(sn.availableAPIs[0]);
     } else {
       setPickerOpen((v) => !v);
     }
   };
 
-  const addr = vault.unshieldedAddress ?? vault.coinPublicKey;
+  const addr = sn.unshieldedAddress ?? sn.coinPublicKey;
 
   return (
     <div className="topbar">
       <div className="brand">
         <span className="dot" />
         <div className="brand-text">
-          <h1>ConvertVault</h1>
+          <h1>Shielded NIGHT</h1>
           <span className="brand-sub">NIGHT ⇄ wNIGHT</span>
         </div>
       </div>
@@ -30,9 +30,9 @@ export function WalletBar({ vault }: { vault: VaultState }) {
       <div className="topbar-right">
         <select
           className="select"
-          value={vault.networkKey}
-          disabled={vault.connecting}
-          onChange={(e) => vault.setNetworkKey(e.target.value as NetworkOption['key'])}
+          value={sn.networkKey}
+          disabled={sn.connecting}
+          onChange={(e) => sn.setNetworkKey(e.target.value as NetworkOption['key'])}
         >
           {networks.map((n) => (
             <option key={n.key} value={n.key}>
@@ -41,13 +41,13 @@ export function WalletBar({ vault }: { vault: VaultState }) {
           ))}
         </select>
 
-        {vault.connected ? (
+        {sn.connected ? (
           <div className="row">
             <span className="chip-connected" title={addr ?? 'connected'}>
               <span className="dot dot-ok" />
               <span className="chip-addr">{addr ? shortHex(addr, 6, 6) : 'connected'}</span>
             </span>
-            <button className="btn btn-ghost" onClick={vault.disconnect}>
+            <button className="btn btn-ghost" onClick={sn.disconnect}>
               Disconnect
             </button>
           </div>
@@ -55,27 +55,27 @@ export function WalletBar({ vault }: { vault: VaultState }) {
           <div style={{ position: 'relative' }}>
             <button
               className="btn btn-primary"
-              disabled={vault.connecting || vault.detecting || vault.availableAPIs.length === 0}
+              disabled={sn.connecting || sn.detecting || sn.availableAPIs.length === 0}
               onClick={onConnectClick}
             >
-              {vault.connecting
+              {sn.connecting
                 ? 'Connecting…'
-                : vault.detecting
+                : sn.detecting
                   ? 'Detecting…'
-                  : vault.availableAPIs.length === 0
+                  : sn.availableAPIs.length === 0
                     ? 'No wallet found'
                     : 'Connect wallet'}
             </button>
-            {pickerOpen && vault.availableAPIs.length > 1 && (
+            {pickerOpen && sn.availableAPIs.length > 1 && (
               <div className="card" style={{ position: 'absolute', right: 0, top: 44, zIndex: 10, minWidth: 200 }}>
-                {vault.availableAPIs.map((a, i) => (
+                {sn.availableAPIs.map((a, i) => (
                   <button
                     key={i}
                     className="btn btn-ghost btn-block"
                     style={{ marginBottom: 6 }}
                     onClick={() => {
                       setPickerOpen(false);
-                      void vault.connect(a);
+                      void sn.connect(a);
                     }}
                   >
                     {a.name}

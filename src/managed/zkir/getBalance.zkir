@@ -7,7 +7,7 @@
     { "op": "constrain_bits", "var": 1, "bits": 248 },
     { "op": "load_imm", "imm": "01" },
     { "op": "load_imm", "imm": "00" },
-    { "op": "load_imm", "imm": "6E696768742D7661756C743A62616C616E6365" },
+    { "op": "load_imm", "imm": "736869656C6465642D6E696768743A62616C616E6365" },
     { "op": "persistent_hash", "alignment": [{ "tag": "atom", "value": { "length": 32, "tag": "bytes" } }, { "tag": "atom", "value": { "length": 32, "tag": "bytes" } }], "inputs": [3, 4, 0, 1] },
     { "op": "load_imm", "imm": "30" },
     { "op": "declare_pub_input", "var": 7 },

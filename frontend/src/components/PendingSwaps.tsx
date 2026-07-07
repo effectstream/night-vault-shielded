@@ -1,32 +1,32 @@
 import { useEffect, useState } from 'react';
-import type { VaultState } from '../hooks/useVault';
-import { errMsg } from '../hooks/useVault';
+import type { ShieldedNightState } from '../hooks/useShieldedNight';
+import { errMsg } from '../hooks/useShieldedNight';
 import { formatAmount } from '../lib/tokens';
 import { loadPending, type PendingSwap, removePending, resumeSwap } from '../lib/swap';
 
-export function PendingSwaps({ vault }: { vault: VaultState }) {
+export function PendingSwaps({ sn }: { sn: ShieldedNightState }) {
   const [pending, setPending] = useState<PendingSwap[]>([]);
   const [busyId, setBusyId] = useState<string>();
 
-  const addr = vault.contractAddress;
+  const addr = sn.contractAddress;
 
   const reload = () => setPending(addr ? loadPending(addr) : []);
-  useEffect(reload, [addr, vault.connected]);
+  useEffect(reload, [addr, sn.connected]);
 
   // Only the second leg (step === 'deposited') is safely resumable.
   const resumable = pending.filter((s) => s.step === 'deposited');
   if (!addr || resumable.length === 0) return null;
 
   async function onResume(s: PendingSwap) {
-    if (!vault.providers || !addr) return;
+    if (!sn.providers || !addr) return;
     setBusyId(s.id);
     try {
-      await resumeSwap(vault.providers, addr, s, vault.coinPublicKey ?? '', vault.unshieldedAddress ?? '', {
-        onLog: vault.appendLog,
+      await resumeSwap(sn.providers, addr, s, sn.coinPublicKey ?? '', sn.unshieldedAddress ?? '', {
+        onLog: sn.appendLog,
       });
-      await vault.refreshBalances();
+      await sn.refreshBalances();
     } catch (e) {
-      vault.appendLog('Resume failed: ' + errMsg(e));
+      sn.appendLog('Resume failed: ' + errMsg(e));
     } finally {
       setBusyId(undefined);
       reload();

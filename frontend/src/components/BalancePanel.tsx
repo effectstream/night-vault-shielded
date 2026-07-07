@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Balances } from '../hooks/useVault';
+import type { Balances } from '../hooks/useShieldedNight';
 import { formatAmount } from '../lib/tokens';
 
 export function BalancePanel({

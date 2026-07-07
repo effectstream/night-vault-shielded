@@ -1,5 +1,5 @@
 /**
- * Deploy ConvertVault from THIS repo's compiled build (src/managed), so the
+ * Deploy ShieldedNight from THIS repo's compiled build (src/managed), so the
  * on-chain verifier keys match the prover keys the frontend serves. Reuses the
  * same Node wallet-sdk wiring the integration tests deploy with.
  *
@@ -23,7 +23,7 @@ import { mnemonicToSeedSync } from '@scure/bip39';
 import { isEnvName, networkFor, type EnvName, GENESIS_MINT_SEED } from '../test/support/network.js';
 import { awaitWalletReady, buildWallet, DEFAULT_RESTORED_SYNC_TIMEOUT_MS } from '../test/support/wallet-builder.js';
 import { setupContract } from '../test/support/setup-contract.js';
-import { DEPLOY_ARGS, factory } from '../test/support/convert-vault.js';
+import { DEPLOY_ARGS, factory } from '../test/support/shielded-night.js';
 
 /**
  * Resolve the wallet seed from MN_MNEMONIC (BIP-39, derived as Lace does) or a
@@ -75,7 +75,7 @@ async function main() {
     const deployed = await deployFresh([name, symbol, decimals]);
     const address = deployed.deployTxData.public.contractAddress;
 
-    console.log('\n✅ deployed ConvertVault');
+    console.log('\n✅ deployed ShieldedNight');
     console.log(`   address: ${address}`);
     console.log(`\nPaste into frontend/.env:`);
     console.log(`   VITE_CONTRACT_ADDRESS_${env.toUpperCase()}=${address}`);

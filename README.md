@@ -1,8 +1,8 @@
-# ConvertVault
+# Shielded NIGHT
 
 Convert native **unshielded NIGHT** into **shielded wNIGHT** (a contract-minted wrapper token) and back, on Midnight.
 
-Live (preview): https://convert-vault.pages.dev
+Live (preview): https://shielded-night.pages.dev
 
 ## What this is
 
@@ -31,7 +31,7 @@ Locked NIGHT backs the wrapper 1:1 across both models - the invariant `locked NI
 ```
 .
 ├── src/
-│   ├── convert-vault.compact        # the Compact contract
+│   ├── shielded-night.compact        # the Compact contract
 │   ├── witnesses.ts                 # private state (none; empty)
 │   ├── index.ts                     # package entry
 │   └── managed/                     # compiled output: contract, keys, zkir (generated)
@@ -48,7 +48,7 @@ Locked NIGHT backs the wrapper 1:1 across both models - the invariant `locked NI
 │   └── src/
 │       ├── App.tsx
 │       ├── components/              # WalletBar, SwapCard, BalancePanel, PendingSwaps, ActivityLog
-│       ├── hooks/useVault.ts        # connect, providers, balances, state
+│       ├── hooks/useShieldedNight.ts        # connect, providers, balances, state
 │       └── lib/                     # connector, providers, walletAdapter, contract, swap, tokens, networks
 ├── .github/workflows/ci.yml         # unit + integration CI
 ├── TESTING.md

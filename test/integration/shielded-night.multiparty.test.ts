@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import * as vault from '../support/convert-vault.js';
+import * as contract from '../support/shielded-night.js';
 import { describeContractWithWallets } from '../support/describe-contract.js';
 import {
   coinsTotal,
@@ -25,12 +25,12 @@ const A_MINT = 200_000n; // A withdraws this much as the shielded wrapper
 const TO_B = 10_000n; // A sends this much wrapper to B
 const TO_C = 20_000n; // A sends this much wrapper to C
 
-/** Sum every credit balance held in the vault ledger. */
+/** Sum every credit balance held in the contract ledger. */
 const sumCredits = async (
-  providers: vault.ConvertVaultProviders,
+  providers: contract.ShieldedNightProviders,
   address: string,
 ): Promise<bigint> => {
-  const state = await vault.factory.readLedger(providers, address);
+  const state = await contract.factory.readLedger(providers, address);
   expect(state).not.toBeNull();
   let sum = 0n;
   for (const [, balance] of state!.balances) sum += balance;
@@ -41,9 +41,9 @@ const sumCredits = async (
  * The wrapper is a real, freely-transferable shielded token: A mints it, sends
  * pieces to B and C with an ordinary wallet-to-wallet shielded transfer (no
  * contract call), and then B and C — who never deposited any NIGHT themselves —
- * each redeem their pieces for native NIGHT through the vault.
+ * each redeem their pieces for native NIGHT through the contract.
  *
- * This proves the vault backs *any* wrapper holder, not just the original
+ * This proves the contract backs *any* wrapper holder, not just the original
  * depositor, and that the NIGHT reserve reconciles across three parties.
  *
  *   A: deposit 1,000,000 NIGHT -> mint 200,000 wrapper -> balance[A] = 800,000
@@ -53,9 +53,9 @@ const sumCredits = async (
  *   reserve: NIGHT locked (970,000) == credits (800,000) + wrapper live (170,000)
  */
 describe.skipIf((process.env.MN_ENV ?? 'undeployed') !== 'undeployed')(
-  'convert-vault — multi-party wrapper circulation',
+  'shielded-night — multi-party wrapper circulation',
   () => {
-    describeContractWithWallets(vault.factory, ['alice', 'bob', 'claire'] as const, (ctx) => {
+    describeContractWithWallets(contract.factory, ['alice', 'bob', 'claire'] as const, (ctx) => {
       test(
         'A mints wrapper, sends to B and C, who each convert it back to NIGHT',
         async () => {
@@ -64,28 +64,28 @@ describe.skipIf((process.env.MN_ENV ?? 'undeployed') !== 'undeployed')(
           const secretB = randomBytes32();
           const secretC = randomBytes32();
 
-          const deployed = await alice.deployFresh([...vault.DEPLOY_ARGS]);
+          const deployed = await alice.deployFresh([...contract.DEPLOY_ARGS]);
           const address = deployed.deployTxData.public.contractAddress;
           const bobView = await bob.connect(address);
           const claireView = await claire.connect(address);
-          const colorHex = tokenColorHex((await vault.tokenColor(deployed)).private.result);
+          const colorHex = tokenColorHex((await contract.tokenColor(deployed)).private.result);
 
           const bobNight0 = await getNightBalance(bob.walletCtx);
           const claireNight0 = await getNightBalance(claire.walletCtx);
 
           // 1. A deposits 1,000,000 native NIGHT.
-          await vault.depositUnshielded(deployed, secretA, A_DEPOSIT);
-          expect((await vault.getBalance(deployed, secretA)).private.result).toBe(A_DEPOSIT);
+          await contract.depositUnshielded(deployed, secretA, A_DEPOSIT);
+          expect((await contract.getBalance(deployed, secretA)).private.result).toBe(A_DEPOSIT);
 
           // 2. A withdraws 200,000 as the shielded wrapper, to herself.
-          await vault.withdrawShielded(
+          await contract.withdrawShielded(
             deployed,
             secretA,
             A_MINT,
             await getCoinPublicKey(alice.walletCtx),
             randomBytes32(),
           );
-          expect((await vault.getBalance(deployed, secretA)).private.result).toBe(A_DEPOSIT - A_MINT);
+          expect((await contract.getBalance(deployed, secretA)).private.result).toBe(A_DEPOSIT - A_MINT);
           await waitForShieldedBalance(alice.walletCtx.wallet, colorHex, (b) => b >= A_MINT);
 
           // 3. A sends 10,000 -> B and 20,000 -> C in one shielded transfer.
@@ -108,30 +108,30 @@ describe.skipIf((process.env.MN_ENV ?? 'undeployed') !== 'undeployed')(
 
           // 4. B converts its wrapper back to NIGHT: burn -> withdraw.
           const bCoin = bCoins[0];
-          await vault.depositShielded(bobView, secretB, bCoin);
-          expect((await vault.getBalance(bobView, secretB)).private.result).toBe(TO_B);
-          await vault.withdrawUnshielded(
+          await contract.depositShielded(bobView, secretB, bCoin);
+          expect((await contract.getBalance(bobView, secretB)).private.result).toBe(TO_B);
+          await contract.withdrawUnshielded(
             bobView,
             secretB,
             TO_B,
-            vault.rightUserAddress(getUserAddress(bob.walletCtx).bytes),
+            contract.rightUserAddress(getUserAddress(bob.walletCtx).bytes),
           );
-          expect((await vault.getBalance(bobView, secretB)).private.result).toBe(0n);
+          expect((await contract.getBalance(bobView, secretB)).private.result).toBe(0n);
           expect(
             await waitForUnshieldedBalance(bob.walletCtx.wallet, NIGHT_HEX, (b) => b >= bobNight0 + TO_B),
           ).toBe(bobNight0 + TO_B);
 
           // 5. C does the same with its 20,000.
           const cCoin = cCoins[0];
-          await vault.depositShielded(claireView, secretC, cCoin);
-          expect((await vault.getBalance(claireView, secretC)).private.result).toBe(TO_C);
-          await vault.withdrawUnshielded(
+          await contract.depositShielded(claireView, secretC, cCoin);
+          expect((await contract.getBalance(claireView, secretC)).private.result).toBe(TO_C);
+          await contract.withdrawUnshielded(
             claireView,
             secretC,
             TO_C,
-            vault.rightUserAddress(getUserAddress(claire.walletCtx).bytes),
+            contract.rightUserAddress(getUserAddress(claire.walletCtx).bytes),
           );
-          expect((await vault.getBalance(claireView, secretC)).private.result).toBe(0n);
+          expect((await contract.getBalance(claireView, secretC)).private.result).toBe(0n);
           expect(
             await waitForUnshieldedBalance(
               claire.walletCtx.wallet,
@@ -141,7 +141,7 @@ describe.skipIf((process.env.MN_ENV ?? 'undeployed') !== 'undeployed')(
           ).toBe(claireNight0 + TO_C);
 
           // 6. A's credit was never touched by B/C activity (per-key isolation).
-          expect((await vault.getBalance(deployed, secretA)).private.result).toBe(A_DEPOSIT - A_MINT);
+          expect((await contract.getBalance(deployed, secretA)).private.result).toBe(A_DEPOSIT - A_MINT);
 
           // 7. Reserve invariant across all three parties:
           //    credits (800,000) + live wrapper (170,000) == NIGHT still locked (970,000).

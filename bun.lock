@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "@zswap-da/contract-convert-vault",
+      "name": "@zswap-da/contract-shielded-night",
       "dependencies": {
         "@midnight-ntwrk/compact-js": "^2.5.1",
         "@midnight-ntwrk/compact-runtime": "0.16.0",

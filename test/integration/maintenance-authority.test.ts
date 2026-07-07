@@ -4,8 +4,8 @@ import {
   submitRemoveVerifierKeyTx,
 } from '@midnight-ntwrk/midnight-js/contracts';
 import { describe, expect, test } from 'vitest';
-import { ConvertVaultContract } from '../../src/index.ts';
-import * as vault from '../support/convert-vault.js';
+import { ShieldedNightContract } from '../../src/index.ts';
+import * as contract from '../support/shielded-night.js';
 import { describeContract } from '../support/describe-contract.js';
 import { buildCompiled, lockContract, readAuthority } from '../support/governance.js';
 import { tryCall } from '../support/smoke-helpers.js';
@@ -29,19 +29,19 @@ import { tryCall } from '../support/smoke-helpers.js';
  */
 
 // Branded circuit id (the SDK's ProvableCircuitId brand) parametrized by the
-// concrete vault contract type, so it carries the literal circuit-id union the
+// concrete contract contract type, so it carries the literal circuit-id union the
 // governance calls expect. Re-inserting an existing circuit's verifier key is a
 // real maintenance update with no semantic change.
-type VaultContract = InstanceType<typeof ConvertVaultContract.Contract>;
-const CIRCUIT = ProvableCircuitId<VaultContract>('getBalance');
+type ContractInstance = InstanceType<typeof ShieldedNightContract.Contract>;
+const CIRCUIT = ProvableCircuitId<ContractInstance>('getBalance');
 
-describe('convert-vault — maintenance authority lock', () => {
-  describeContract(vault.factory, (ctx) => {
+describe('shielded-night — maintenance authority lock', () => {
+  describeContract(contract.factory, (ctx) => {
     test(
       'a contract can be frozen by dissolving its maintenance committee',
       async () => {
         const c = ctx();
-        const deployed = await c.deployFresh([...vault.DEPLOY_ARGS]);
+        const deployed = await c.deployFresh([...contract.DEPLOY_ARGS]);
         const address = deployed.deployTxData.public.contractAddress;
         const compiled = buildCompiled(c.zkConfigPath);
         const vk = await c.providers.zkConfigProvider.getVerifierKey(CIRCUIT);
@@ -83,8 +83,8 @@ describe('convert-vault — maintenance authority lock', () => {
         // And the contract's circuits still work — frozen means un-upgradeable,
         // not disabled.
         const secret = new Uint8Array(32).fill(7);
-        await vault.depositUnshielded(deployed, secret, 1_000n);
-        expect((await vault.getBalance(deployed, secret)).private.result).toBe(1_000n);
+        await contract.depositUnshielded(deployed, secret, 1_000n);
+        expect((await contract.getBalance(deployed, secret)).private.result).toBe(1_000n);
       },
       10 * 60_000,
     );

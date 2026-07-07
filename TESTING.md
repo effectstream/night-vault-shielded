@@ -22,7 +22,7 @@ bun run compact:fast   # compile contract JS only (--skip-zk, no prover keys)
 bun run test:unit
 ```
 
-The simulator ([test/unit/simulators/ConvertVaultSimulator.ts](test/unit/simulators/ConvertVaultSimulator.ts))
+The simulator ([test/unit/simulators/ShieldedNightSimulator.ts](test/unit/simulators/ShieldedNightSimulator.ts))
 executes the compiled circuits directly: state assertions are exact and failed
 calls throw the contract's `assert` messages. Token movements are recorded as
 transaction effects, not balanced against a real ledger — that's the
@@ -38,7 +38,7 @@ bun run test:integration
 `test/integration/global-setup.ts` boots the docker stack
 (`envs/docker-compose-dynamic.yml`: midnight-node 1.0.0, indexer-standalone
 4.3.3, proof-server 8.1.0) via testcontainers, then the suite deploys the
-vault with the genesis wallet and runs the full README round trip
+contract with the genesis wallet and runs the full README round trip
 (depositUnshielded → withdrawShielded → depositShielded → withdrawUnshielded),
 the negative paths, and a two-wallet independence test.
 
@@ -84,13 +84,13 @@ input that `receiveUnshielded` needs — deposits would fail with
 Both tiers carry a dedicated security/border-case suite for the
 token-loss and token-theft vectors:
 
-- **Unit** ([test/unit/convert-vault.security.unit.test.ts](test/unit/convert-vault.security.unit.test.ts)):
+- **Unit** ([test/unit/shielded-night.security.unit.test.ts](test/unit/shielded-night.security.unit.test.ts)):
   value-range boundaries (max single deposit, encode-level range rejection,
   the zswap 2^64−1 coin-value cap, credit accumulation past 2^64 without
   wrapping), exact-balance withdrawal boundaries, balance-key isolation
   (zero secret, one-bit-different secrets), the zero-recipient guards, and
   state integrity after failed calls.
-- **Integration** ([test/integration/convert-vault.security.test.ts](test/integration/convert-vault.security.test.ts)):
+- **Integration** ([test/integration/shielded-night.security.test.ts](test/integration/shielded-night.security.test.ts)):
   ledger-enforced properties the simulator cannot falsify — forged
   (never-minted) coins, inflated coin values, double-burns of a spent coin,
   nonce-reuse double-mints (duplicate commitment), the reserve invariant
@@ -104,7 +104,7 @@ locked (this guard was added by this suite; see git history).
 
 ## Transient variant (`depositShielded_notWorking`)
 
-[test/integration/convert-vault.transient.test.ts](test/integration/convert-vault.transient.test.ts)
+[test/integration/shielded-night.transient.test.ts](test/integration/shielded-night.transient.test.ts)
 plus a unit suite verify the `sendImmediateShielded` variant end-to-end on the
 current stack: the transaction applies, credits are exact, the partial-burn
 change coin is returned with the exact remainder and is spendable, and the

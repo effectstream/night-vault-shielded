@@ -1,6 +1,6 @@
-# ConvertVault Frontend — NIGHT ⇄ wNIGHT DEX
+# ShieldedNight Frontend — NIGHT ⇄ wNIGHT DEX
 
-A browser dApp for the ConvertVault contract: convert native unshielded **NIGHT**
+A browser dApp for the ShieldedNight contract: convert native unshielded **NIGHT**
 into the shielded wrapper **wNIGHT** and back. Connects to any `window.midnight[*]`
 wallet, reads shielded + unshielded balances, and targets preview / preprod
 (mainnet later) via a network dropdown.
@@ -17,14 +17,14 @@ bun run dev               # http://localhost:5173
 ```
 
 Requires the contract's compiled artifacts at `../src/managed` (run `bun run compact`
-in the repo root if missing). Vite serves them at `/contract/compiled/convert-vault`
+in the repo root if missing). Vite serves them at `/contract/compiled/shielded-night`
 so the browser proof step can fetch prover/verifier keys.
 
 ## Configuration (`.env`)
 
 | Var | Purpose |
 | --- | --- |
-| `VITE_CONTRACT_ADDRESS_PREVIEW` / `_PREPROD` / `_UNDEPLOYED` | Deployed vault address per network (the dropdown picks which is used). |
+| `VITE_CONTRACT_ADDRESS_PREVIEW` / `_PREPROD` / `_UNDEPLOYED` | Deployed contract address per network (the dropdown picks which is used). |
 | `VITE_WRAPPER_TOKEN_TYPE_*` | Optional. Override the wNIGHT shielded token-type key if the app can't auto-identify it in the wallet's balances. |
 | `VITE_PROOF_SERVER_URI` | Optional. Override the proof server; defaults to the `proverServerUri` the connected wallet reports. |
 

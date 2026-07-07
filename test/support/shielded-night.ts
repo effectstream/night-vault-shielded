@@ -1,5 +1,5 @@
 import { type ContractAddress } from '@midnight-ntwrk/compact-runtime';
-import { ConvertVaultContract, type ConvertVaultPrivateState } from '../../src/index.ts';
+import { ShieldedNightContract, type ShieldedNightPrivateState } from '../../src/index.ts';
 import {
   type ContractCircuits,
   type ContractDeployed,
@@ -7,36 +7,36 @@ import {
   defineContract,
 } from './contract-factory.js';
 
-const CONVERT_VAULT_PRIVATE_STATE_ID = 'convertVaultPrivateState' as const;
+const SHIELDED_NIGHT_PRIVATE_STATE_ID = 'shieldedNightPrivateState' as const;
 
 /**
- * ConvertVault factory. The contract has no witnesses (the secret is a circuit
+ * ShieldedNight factory. The contract has no witnesses (the secret is a circuit
  * argument), so `witnesses` is omitted and the factory takes the
  * vacant-witnesses path.
  */
 export const factory = defineContract({
-  name: 'convert-vault',
-  contractCtor: ConvertVaultContract.Contract,
-  ledger: ConvertVaultContract.ledger,
-  privateStateId: CONVERT_VAULT_PRIVATE_STATE_ID,
-  initialPrivateState: {} as ConvertVaultPrivateState,
+  name: 'shielded-night',
+  contractCtor: ShieldedNightContract.Contract,
+  ledger: ShieldedNightContract.ledger,
+  privateStateId: SHIELDED_NIGHT_PRIVATE_STATE_ID,
+  initialPrivateState: {} as ShieldedNightPrivateState,
 });
 
-export type ConvertVaultCircuits = ContractCircuits<typeof factory>;
-export type ConvertVaultProviders = ContractProviders<typeof factory>;
-export type DeployedConvertVault = ContractDeployed<typeof factory>;
+export type ShieldedNightCircuits = ContractCircuits<typeof factory>;
+export type ShieldedNightProviders = ContractProviders<typeof factory>;
+export type DeployedShieldedNight = ContractDeployed<typeof factory>;
 
 /** Constructor args used by every test deploy: 6 decimals to match native NIGHT. */
 export const DEPLOY_ARGS = ['Wrapped NIGHT', 'wNIGHT', 6n] as const;
 
-export const deploy = (providers: ConvertVaultProviders, zkConfigPath: string): Promise<DeployedConvertVault> =>
+export const deploy = (providers: ShieldedNightProviders, zkConfigPath: string): Promise<DeployedShieldedNight> =>
   factory.deploy(providers, zkConfigPath, [...DEPLOY_ARGS]);
 
 export const connect = (
-  providers: ConvertVaultProviders,
+  providers: ShieldedNightProviders,
   zkConfigPath: string,
   contractAddress: ContractAddress,
-): Promise<DeployedConvertVault> => factory.connect(providers, zkConfigPath, contractAddress);
+): Promise<DeployedShieldedNight> => factory.connect(providers, zkConfigPath, contractAddress);
 
 /** `Either<ContractAddress, UserAddress>` with the user (right) branch populated. */
 export const rightUserAddress = (bytes: Uint8Array) => ({
@@ -45,14 +45,14 @@ export const rightUserAddress = (bytes: Uint8Array) => ({
   right: { bytes },
 });
 
-export const getBalance = (deployed: DeployedConvertVault, secret: Uint8Array) =>
+export const getBalance = (deployed: DeployedShieldedNight, secret: Uint8Array) =>
   deployed.callTx.getBalance(secret);
 
-export const depositUnshielded = (deployed: DeployedConvertVault, secret: Uint8Array, amount: bigint) =>
+export const depositUnshielded = (deployed: DeployedShieldedNight, secret: Uint8Array, amount: bigint) =>
   deployed.callTx.depositUnshielded(secret, amount);
 
 export const depositShielded = (
-  deployed: DeployedConvertVault,
+  deployed: DeployedShieldedNight,
   secret: Uint8Array,
   coin: { nonce: Uint8Array; color: Uint8Array; value: bigint },
 ) => deployed.callTx.depositShielded(secret, coin);
@@ -66,7 +66,7 @@ export const leftCoinPublicKey = (bytes: Uint8Array) => ({
 
 /** The sendImmediateShielded variant: burn `amount` of `coin`, refund the rest. */
 export const depositShieldedWithChange = (
-  deployed: DeployedConvertVault,
+  deployed: DeployedShieldedNight,
   secret: Uint8Array,
   coin: { nonce: Uint8Array; color: Uint8Array; value: bigint },
   amount: bigint,
@@ -74,14 +74,14 @@ export const depositShieldedWithChange = (
 ) => deployed.callTx.depositShielded_notWorking(secret, coin, amount, refundTo);
 
 export const withdrawUnshielded = (
-  deployed: DeployedConvertVault,
+  deployed: DeployedShieldedNight,
   secret: Uint8Array,
   amount: bigint,
   recipient: ReturnType<typeof rightUserAddress>,
 ) => deployed.callTx.withdrawUnshielded(secret, amount, recipient);
 
 export const withdrawShielded = (
-  deployed: DeployedConvertVault,
+  deployed: DeployedShieldedNight,
   secret: Uint8Array,
   amount: bigint,
   recipient: { bytes: Uint8Array },
@@ -90,7 +90,7 @@ export const withdrawShielded = (
 
 /** Atomic NIGHT -> wNIGHT in one tx (no secret). */
 export const convertToShielded = (
-  deployed: DeployedConvertVault,
+  deployed: DeployedShieldedNight,
   amount: bigint,
   recipient: { bytes: Uint8Array },
   nonce: Uint8Array,
@@ -98,12 +98,12 @@ export const convertToShielded = (
 
 /** Atomic wNIGHT -> NIGHT in one tx (no secret). */
 export const convertToUnshielded = (
-  deployed: DeployedConvertVault,
+  deployed: DeployedShieldedNight,
   coin: { nonce: Uint8Array; color: Uint8Array; value: bigint },
   recipient: ReturnType<typeof rightUserAddress>,
 ) => deployed.callTx.convertToUnshielded(coin, recipient);
 
-export const tokenColor = (deployed: DeployedConvertVault) => deployed.callTx.tokenColor();
-export const name = (deployed: DeployedConvertVault) => deployed.callTx.name();
-export const symbol = (deployed: DeployedConvertVault) => deployed.callTx.symbol();
-export const decimals = (deployed: DeployedConvertVault) => deployed.callTx.decimals();
+export const tokenColor = (deployed: DeployedShieldedNight) => deployed.callTx.tokenColor();
+export const name = (deployed: DeployedShieldedNight) => deployed.callTx.name();
+export const symbol = (deployed: DeployedShieldedNight) => deployed.callTx.symbol();
+export const decimals = (deployed: DeployedShieldedNight) => deployed.callTx.decimals();

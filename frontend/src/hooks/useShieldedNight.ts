@@ -3,7 +3,7 @@ import type { ConnectedAPI, InitialAPI } from '@midnight-ntwrk/dapp-connector-ap
 import { setNetworkId } from '@midnight-ntwrk/midnight-js/network-id';
 import { findInitialAPIs, isCompatibleApiVersion } from '../lib/connector';
 import { buildProviders } from '../lib/providers';
-import type { ConvertVaultProviders } from '../lib/contract';
+import { ledger, type ShieldedNightProviders } from '../lib/contract';
 import {
   contractAddressFor,
   NETWORKS,
@@ -22,7 +22,7 @@ export interface Balances {
   allUnshielded: Record<string, bigint>;
 }
 
-export interface VaultState {
+export interface ShieldedNightState {
   networkKey: NetworkOption['key'];
   setNetworkKey: (k: NetworkOption['key']) => void;
   contractAddress: string | undefined;
@@ -34,7 +34,7 @@ export interface VaultState {
   connected: boolean;
   walletName?: string;
   connectedAPI?: ConnectedAPI;
-  providers?: ConvertVaultProviders;
+  providers?: ShieldedNightProviders;
   coinPublicKey?: string;
   unshieldedAddress?: string;
   networkIdConnected?: string;
@@ -43,6 +43,9 @@ export interface VaultState {
   refreshBalances: () => Promise<void>;
   /** The wrapper (wNIGHT) 32-byte color hex for the selected network, if known. */
   wrapperColorHex?: string;
+  /** Wrapper token metadata read from the contract's public ledger, once connected. */
+  tokenName?: string;
+  tokenSymbol?: string;
 
   connect: (api: InitialAPI) => Promise<void>;
   disconnect: () => void;
@@ -52,19 +55,21 @@ export interface VaultState {
   error?: string;
 }
 
-export function useVault(): VaultState {
+export function useShieldedNight(): ShieldedNightState {
   const [networkKey, setNetworkKeyState] = useState<NetworkOption['key']>('preview');
   const [availableAPIs, setAvailableAPIs] = useState<InitialAPI[]>([]);
   const [detecting, setDetecting] = useState(true);
 
   const [connecting, setConnecting] = useState(false);
   const [connectedAPI, setConnectedAPI] = useState<ConnectedAPI>();
-  const [providers, setProviders] = useState<ConvertVaultProviders>();
+  const [providers, setProviders] = useState<ShieldedNightProviders>();
   const [coinPublicKey, setCoinPublicKey] = useState<string>();
   const [unshieldedAddress, setUnshieldedAddress] = useState<string>();
   const [networkIdConnected, setNetworkIdConnected] = useState<string>();
   const [walletName, setWalletName] = useState<string>();
   const [balances, setBalances] = useState<Balances>();
+  const [tokenName, setTokenName] = useState<string>();
+  const [tokenSymbol, setTokenSymbol] = useState<string>();
   const [logs, setLogs] = useState<string[]>([]);
   const [error, setError] = useState<string>();
 
@@ -94,6 +99,31 @@ export function useVault(): VaultState {
     }, 500);
     return () => clearInterval(id);
   }, []);
+
+  // Read the wrapper token metadata (name/symbol) straight from public contract
+  // state - sealed ledger fields, so no proving and no wallet call needed.
+  useEffect(() => {
+    let cancelled = false;
+    if (!providers || !contractAddress) {
+      setTokenName(undefined);
+      setTokenSymbol(undefined);
+      return;
+    }
+    void (async () => {
+      try {
+        const state = await providers.publicDataProvider.queryContractState(contractAddress);
+        if (cancelled || state == null) return;
+        const l = ledger(state.data);
+        setTokenName(l._name);
+        setTokenSymbol(l._symbol);
+      } catch (e) {
+        appendLog('Failed to read token metadata: ' + errMsg(e));
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [providers, contractAddress, appendLog]);
 
   const apiRef = useRef<ConnectedAPI>();
   apiRef.current = connectedAPI;
@@ -196,6 +226,8 @@ export function useVault(): VaultState {
     balances,
     refreshBalances,
     wrapperColorHex,
+    tokenName,
+    tokenSymbol,
     connect,
     disconnect,
     logs,

@@ -47,14 +47,14 @@ export function nativeNightKeys(): string[] {
 
 /**
  * Best-effort derivation of the wrapper (wNIGHT) shielded token color from the
- * contract address, matching the contract's `tokenType(pad(32,"night-vault:shielded-wrapper"), self())`.
+ * contract address, matching the contract's `tokenType(pad(32,"shielded-night:wrapper"), self())`.
  * Returns the raw hex, or null if the SDK shape prevents derivation (the UI
  * falls back to showing the full shielded-balance map).
  */
 export function deriveWrapperColorHex(contractAddress: string): string | null {
   try {
     const domain = new Uint8Array(32);
-    domain.set(new TextEncoder().encode('night-vault:shielded-wrapper'));
+    domain.set(new TextEncoder().encode('shielded-night:wrapper'));
     // rawTokenType(domainSep, contract) mirrors the contract's tokenType(...).
     const raw = (ledger as unknown as {
       rawTokenType: (d: Uint8Array, c: string) => string;

@@ -1,8 +1,8 @@
 import { submitCallTx } from '@midnight-ntwrk/midnight-js/contracts';
 import { MidnightBech32m } from '@midnight-ntwrk/wallet-sdk-address-format';
 import {
-  CompiledConvertVault,
-  type ConvertVaultProviders,
+  CompiledShieldedNight,
+  type ShieldedNightProviders,
   rightUserAddress,
   type ShieldedCoinInfo,
 } from './contract';
@@ -116,11 +116,11 @@ export function trackedWrapperTotal(addr: string): bigint {
 
 // ---------- circuit calls ----------
 
-type Providers = ConvertVaultProviders;
+type Providers = ShieldedNightProviders;
 
 async function call(providers: Providers, contractAddress: string, circuitId: string, args: unknown[]) {
   return submitCallTx(providers as never, {
-    compiledContract: CompiledConvertVault,
+    compiledContract: CompiledShieldedNight,
     contractAddress,
     circuitId,
     args,

@@ -11,10 +11,10 @@ import {
   ledger,
 } from '../../../src/managed/contract/index.js';
 
-/** ConvertVault has no witnesses; its private state is empty. */
-export type ConvertVaultPrivateState = Record<string, never>;
+/** ShieldedNight has no witnesses; its private state is empty. */
+export type ShieldedNightPrivateState = Record<string, never>;
 
-/** Zswap coin public key of the simulated caller (value is irrelevant to the vault). */
+/** Zswap coin public key of the simulated caller (value is irrelevant to the contract). */
 const COIN_PK = '0'.repeat(64);
 
 export interface ShieldedCoin {
@@ -37,22 +37,22 @@ export const rightUserAddress = (bytes: Uint8Array): EitherContractOrUser => ({
 });
 
 /**
- * In-memory simulator for the ConvertVault contract, following the
+ * In-memory simulator for the ShieldedNight contract, following the
  * OpenZeppelin compact-contracts simulator pattern: the compiled contract's
  * impure circuits run against a locally held CircuitContext, and each
  * successful call threads the updated context back so ledger state advances
  * across calls. Failed calls throw before the context is replaced, so state
  * is untouched — matching on-chain semantics.
  */
-export class ConvertVaultSimulator {
-  readonly contract: Contract<ConvertVaultPrivateState>;
+export class ShieldedNightSimulator {
+  readonly contract: Contract<ShieldedNightPrivateState>;
   readonly contractAddress: string;
-  private ctx: CircuitContext<ConvertVaultPrivateState>;
+  private ctx: CircuitContext<ShieldedNightPrivateState>;
 
   constructor(name: string, symbol: string, decimals: bigint) {
-    this.contract = new Contract<ConvertVaultPrivateState>({});
+    this.contract = new Contract<ShieldedNightPrivateState>({});
     const init = this.contract.initialState(
-      createConstructorContext<ConvertVaultPrivateState>({}, COIN_PK),
+      createConstructorContext<ShieldedNightPrivateState>({}, COIN_PK),
       name,
       symbol,
       decimals,
@@ -71,7 +71,7 @@ export class ConvertVaultSimulator {
     return ledger(this.ctx.currentQueryContext.state);
   }
 
-  private advance<R>(res: CircuitResults<ConvertVaultPrivateState, R>): R {
+  private advance<R>(res: CircuitResults<ShieldedNightPrivateState, R>): R {
     // Each simulator call models its own transaction: keep the updated ledger
     // state but discard the accumulated Zswap local state (coin receives/sends
     // recorded by the previous call). Without this, successive deposits share

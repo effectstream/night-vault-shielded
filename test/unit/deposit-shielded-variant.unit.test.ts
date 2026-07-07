@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
-  ConvertVaultSimulator,
+  ShieldedNightSimulator,
   type ShieldedCoin,
-} from './simulators/ConvertVaultSimulator.js';
+} from './simulators/ShieldedNightSimulator.js';
 
 /**
  * Circuit-logic verification of `depositShielded_notWorking` — the
@@ -13,7 +13,7 @@ import {
  * (spent UTXOs still shown). This suite establishes whether the CONTRACT
  * side is correct: credits, burn accounting, change value/color, and the
  * guard asserts. The wallet-view question is measured on a real stack in
- * test/integration/convert-vault.transient.test.ts.
+ * test/integration/shielded-night.transient.test.ts.
  */
 
 const N = 1_000_000n;
@@ -32,64 +32,64 @@ const REFUND_TO = {
 };
 
 describe('depositShielded_notWorking (sendImmediateShielded variant, simulator)', () => {
-  let vault: ConvertVaultSimulator;
+  let contract: ShieldedNightSimulator;
   let coin: ShieldedCoin;
 
   beforeEach(() => {
-    vault = new ConvertVaultSimulator('Wrapped NIGHT', 'wNIGHT', 6n);
+    contract = new ShieldedNightSimulator('Wrapped NIGHT', 'wNIGHT', 6n);
     // Mint a real wrapper coin to burn from.
-    vault.depositUnshielded(SECRET, N);
-    coin = vault.withdrawShielded(SECRET, N, { bytes: b32('me') }, b32('mint-nonce'));
-    expect(vault.getBalance(SECRET)).toBe(0n);
+    contract.depositUnshielded(SECRET, N);
+    coin = contract.withdrawShielded(SECRET, N, { bytes: b32('me') }, b32('mint-nonce'));
+    expect(contract.getBalance(SECRET)).toBe(0n);
   });
 
   it('full burn: credits the whole coin value and returns no change', () => {
-    const res = vault.depositShieldedWithChange(SECRET, coin, N, REFUND_TO);
+    const res = contract.depositShieldedWithChange(SECRET, coin, N, REFUND_TO);
     expect(res.is_some).toBe(false);
-    expect(vault.getBalance(SECRET)).toBe(N);
+    expect(contract.getBalance(SECRET)).toBe(N);
   });
 
   it('partial burn: credits only the burned amount and returns the exact change', () => {
     const burn = N / 4n;
-    const res = vault.depositShieldedWithChange(SECRET, coin, burn, REFUND_TO);
+    const res = contract.depositShieldedWithChange(SECRET, coin, burn, REFUND_TO);
     expect(res.is_some).toBe(true);
     expect(res.value.value).toBe(N - burn);
-    expect(res.value.color).toEqual(vault.tokenColor());
-    expect(vault.getBalance(SECRET)).toBe(burn);
+    expect(res.value.color).toEqual(contract.tokenColor());
+    expect(contract.getBalance(SECRET)).toBe(burn);
     // credit + change == original coin: nothing minted, nothing lost.
-    expect(vault.getBalance(SECRET) + res.value.value).toBe(coin.value);
+    expect(contract.getBalance(SECRET) + res.value.value).toBe(coin.value);
   });
 
   it('rejects amount exceeding the coin value', () => {
     expect(() =>
-      vault.depositShieldedWithChange(SECRET, coin, N + 1n, REFUND_TO),
+      contract.depositShieldedWithChange(SECRET, coin, N + 1n, REFUND_TO),
     ).toThrow('amount exceeds coin value');
   });
 
   it('rejects a zero amount', () => {
     expect(() =>
-      vault.depositShieldedWithChange(SECRET, coin, 0n, REFUND_TO),
+      contract.depositShieldedWithChange(SECRET, coin, 0n, REFUND_TO),
     ).toThrow('amount must be positive');
   });
 
   it('rejects a zero-value coin', () => {
     expect(() =>
-      vault.depositShieldedWithChange(SECRET, { ...coin, value: 0n }, 1n, REFUND_TO),
+      contract.depositShieldedWithChange(SECRET, { ...coin, value: 0n }, 1n, REFUND_TO),
     ).toThrow('coin value must be positive');
   });
 
-  it('rejects a coin that is not the vault wrapper', () => {
+  it('rejects a coin that is not the contract wrapper', () => {
     const foreign = { ...coin, color: coin.color.slice() };
     foreign.color[0] ^= 0xff;
     expect(() =>
-      vault.depositShieldedWithChange(SECRET, foreign, N, REFUND_TO),
-    ).toThrow("not this vault's shielded wrapper");
+      contract.depositShieldedWithChange(SECRET, foreign, N, REFUND_TO),
+    ).toThrow("not this contract's shielded wrapper");
   });
 
   it('leaves the balance untouched after a rejected burn', () => {
     expect(() =>
-      vault.depositShieldedWithChange(SECRET, coin, N + 1n, REFUND_TO),
+      contract.depositShieldedWithChange(SECRET, coin, N + 1n, REFUND_TO),
     ).toThrow();
-    expect(vault.getBalance(SECRET)).toBe(0n);
+    expect(contract.getBalance(SECRET)).toBe(0n);
   });
 });
