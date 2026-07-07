@@ -45,8 +45,7 @@ export function WalletBar({ vault }: { vault: VaultState }) {
           <div className="row">
             <span className="chip-connected" title={addr ?? 'connected'}>
               <span className="dot dot-ok" />
-              {vault.walletName ?? 'Wallet'}
-              {addr ? <span className="chip-addr">·{shortHex(addr, 0, 4)}</span> : null}
+              <span className="chip-addr">{addr ? shortHex(addr, 6, 6) : 'connected'}</span>
             </span>
             <button className="btn btn-ghost" onClick={vault.disconnect}>
               Disconnect
