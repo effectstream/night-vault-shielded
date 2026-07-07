@@ -1,91 +1,46 @@
-# ConvertVault — two-step convertible-balance pool (hash-keyed)
+# ConvertVault
 
-A convertible-balance pool that sidesteps the wallet SDK's "no combined
-shielded↔unshielded call" limitation by making **every circuit single-domain**.
-A user holds a credit balance keyed by `hash(secret)`; they deposit in either
-domain to add credit and withdraw in either domain to remove it.
+Convert native **unshielded NIGHT** into **shielded wNIGHT** (a contract-minted wrapper token) and back, on Midnight.
 
-```
-balance[hash(secret)] = (deposited unshielded + deposited shielded, burnt)
-                      -  (withdrawn unshielded   + withdrawn shielded, minted)
-```
+Live (preview): https://convert-vault.pages.dev
 
-| Circuit | Domain | Effect |
-| --- | --- | --- |
-| `depositUnshielded(secret, amount)` | unshielded only | lock native NIGHT → credit `balance` |
-| `withdrawShielded(secret, amount)` | shielded only | mint wrapper to caller ← debit `balance` |
-| `depositShielded(secret, coin)` | shielded only | burn wrapper → credit `balance` |
-| `withdrawUnshielded(secret, amount, to)` | unshielded only | release native NIGHT ← debit `balance` |
+## What this is
 
-- **Convert unshielded → shielded** = `depositUnshielded` then `withdrawShielded` (two calls).
-- **Convert shielded → unshielded** = `depositShielded` then `withdrawUnshielded` (two calls).
-- The `secret` is always a private circuit input; only `hash(secret)` is public
-  (the balance key). Deposits and withdrawals to the same key are on-chain
-  linkable — a first, simple privacy model (a nullifier scheme would unlink them).
+A wallet can't do a combined shielded/unshielded transfer in a single call, so ConvertVault splits each conversion into two single-domain steps against a pool. You hold a credit balance keyed by `hash(secret)`:
 
-The underlying is native NIGHT (created outside the contract); the shielded side is
-a contract-minted wrapper, color `tokenType("night-vault:shielded-wrapper", self())`. Locked NIGHT
-backs unshielded withdrawals; the wrapper is elastic (mint on withdraw, burn on
-deposit). A single-user A-then-B round trip is self-funding: the NIGHT locked by
-`depositUnshielded` is the reserve `withdrawUnshielded` later draws from.
+- **Unshielded NIGHT -> shielded wNIGHT:** `depositUnshielded(secret, amount)` locks NIGHT and credits your key, then `withdrawShielded(secret, amount, ...)` mints wNIGHT to you and debits it.
+- **Shielded wNIGHT -> unshielded NIGHT:** `depositShielded(secret, coin)` burns wNIGHT and credits your key, then `withdrawUnshielded(secret, amount, to)` releases NIGHT and debits it.
 
-## Build
+`secret` is always a private circuit input; only `hash(secret)` (the balance key) is public. Locked NIGHT backs the wrapper 1:1 - the invariant `locked NIGHT == credits + outstanding wNIGHT` keeps every holder solvent.
+
+Contract: `src/convert-vault.compact`. Web app: `frontend/`.
+
+## How to run
+
+The frontend is a Vite + React app that connects to any `window.midnight` wallet (e.g. Lace), reads your NIGHT/wNIGHT balances, and runs the two-step swaps. Proving is delegated to the wallet.
 
 ```bash
-bun run --filter @zswap-da/contract-convert-vault compact
-# → managed/{contract,keys,zkir} for all 4 circuits
+cd frontend
+bun install
+cp .env.example .env     # set VITE_CONTRACT_ADDRESS_PREVIEW to your deployed contract
+bun run dev              # http://localhost:5173
 ```
 
-Compiles with `compactc` 0.30.0 (language ≥ 0.20).
+Needs a Midnight wallet extension and the compiled artifacts in `src/managed/` (run `bun run compact` at the repo root if missing). Deploy details and the wallet-proving model are in [frontend/README.md](frontend/README.md).
 
-## Testing
-
-Two tiers — see [TESTING.md](TESTING.md) for details and environment variables:
+Deploy a contract (needs a funded, DUST-registered wallet):
 
 ```bash
-bun run compact:fast && bun run test:unit   # 23 simulator tests, no infrastructure, <1s
-bun run compact && bun run test:integration # 8 tests against a real docker stack (~12 min)
+MN_ENV=preview MN_MNEMONIC="your phrase" bun run scripts/deploy.ts
 ```
 
-The integration suite (midnight-canary harness: midnight-node 1.0.0, indexer
-4.3.3, proof-server 8.1.0, genesis wallets) covers the full round trip in both
-directions, the negative paths, and two-wallet independence. CI runs both
-tiers on every push/PR (`.github/workflows/ci.yml`).
+## How to run tests
 
-## Live status (undeployed network, node 0.22.5) — ✅ FULL ROUND TRIP PASSES
-
-Run (force the genesis wallet — the repo `.env` sets a non-genesis mnemonic):
+Two tiers (details and env vars in [TESTING.md](TESTING.md)):
 
 ```bash
-MIDNIGHT_NETWORK_ID=undeployed \
-MIDNIGHT_WALLET_SEED=0000000000000000000000000000000000000000000000000000000000000001 \
-MIDNIGHT_STORAGE_PASSWORD=YourPasswordMy1! \
-  bun packages/contracts-midnight/convert-vault-e2e.ts
+bun run compact:fast && bun run test:unit     # simulator unit tests, no infra, seconds
+bun run compact && bun run test:integration   # docker stack: node + indexer + proof server, minutes
 ```
 
-Verified live, every check green:
-
-```
-✅ deploy; initial balance == 0, wrapper == 0
-✅ depositUnshielded(N)  → balance == N,  wrapper == 0
-✅ withdrawShielded(N)   → coin value N, balance == 0, wrapper == N
-✅ depositShielded(coin) → balance == N, wrapper == 0
-✅ withdrawUnshielded(N) → balance == 0, wrapper == 0
-✅ FULL TWO-STEP ROUND TRIP PASSED (unshielded↔shielded, both directions)
-```
-
-### The balancing fix
-
-The earlier `Custom error: 138` (`BalanceCheckOverspend`) on `depositUnshielded`
-was **provider wiring, not the contract**. effectstream's default
-`WalletProvider.balanceTx` did `tx.bind()` and then `balanceFinalizedTransaction`
-— binding locks the transaction structure, so the wallet can't attach the
-unshielded UTXO input the contract's `receiveUnshielded` needs. The e2e overrides
-`balanceTx` with canary's pattern (`balanceUnboundTransaction` → `signRecipe` →
-`finalizeRecipe`), which balances the **unbound** tx so unshielded inputs are
-scanned, attached, and signed before binding. (Pure-shielded calls worked either
-way, which is why `withdrawShielded` never hit this.)
-
-This two-step, single-domain design is why it works end-to-end: each circuit
-touches only one value domain, so the atomic **combined** shielded↔unshielded call
-(which the wallet SDK still rejects — see `contract-shield-vault`) is never needed.
+Unit tests run every circuit against an in-memory context, including security and border cases. Integration tests deploy to a local stack and cover the full round trip both directions, negative paths, multi-party circulation, and the maintenance-authority lock. CI runs both tiers on every push (`.github/workflows/ci.yml`).
