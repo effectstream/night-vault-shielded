@@ -13,7 +13,31 @@ A wallet can't do a combined shielded/unshielded transfer in a single call, so C
 
 `secret` is always a private circuit input; only `hash(secret)` (the balance key) is public. Locked NIGHT backs the wrapper 1:1 - the invariant `locked NIGHT == credits + outstanding wNIGHT` keeps every holder solvent.
 
-Contract: `src/convert-vault.compact`. Web app: `frontend/`.
+## Layout
+
+```
+.
+├── src/
+│   ├── convert-vault.compact        # the Compact contract
+│   ├── witnesses.ts                 # private state (none; empty)
+│   ├── index.ts                     # package entry
+│   └── managed/                     # compiled output: contract, keys, zkir (generated)
+├── test/
+│   ├── unit/                        # simulator unit tests (+ security, transient)
+│   ├── integration/                 # docker-stack tests + global setup
+│   └── support/                     # ported midnight-canary harness + contract factory
+├── scripts/deploy.ts                # deploy from src/managed (mnemonic or seed)
+├── envs/docker-compose-dynamic.yml  # local node + indexer + proof server
+├── frontend/                        # Vite + React dApp
+│   └── src/
+│       ├── App.tsx
+│       ├── components/              # WalletBar, SwapCard, BalancePanel, PendingSwaps, ActivityLog
+│       ├── hooks/useVault.ts        # connect, providers, balances, state
+│       └── lib/                     # connector, providers, walletAdapter, contract, swap, tokens, networks
+├── .github/workflows/ci.yml         # unit + integration CI
+├── TESTING.md
+└── README.md
+```
 
 ## How to run
 
