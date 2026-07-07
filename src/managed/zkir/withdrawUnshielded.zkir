@@ -25,7 +25,7 @@
     { "op": "cond_select", "bit": 17, "a": 9, "b": 8 },
     { "op": "cond_select", "bit": 3, "a": 14, "b": 18 },
     { "op": "assert", "cond": 19 },
-    { "op": "load_imm", "imm": "6D697031323A62616C616E6365" },
+    { "op": "load_imm", "imm": "6E696768742D7661756C743A62616C616E6365" },
     { "op": "persistent_hash", "alignment": [{ "tag": "atom", "value": { "length": 32, "tag": "bytes" } }, { "tag": "atom", "value": { "length": 32, "tag": "bytes" } }], "inputs": [9, 20, 0, 1] },
     { "op": "less_than", "a": 9, "b": 2, "bits": 128 },
     { "op": "assert", "cond": 23 },

@@ -1,4 +1,4 @@
-# ConvertVault — MIP-0012 two-step variant (hash-keyed pool)
+# ConvertVault — two-step convertible-balance pool (hash-keyed)
 
 A convertible-balance pool that sidesteps the wallet SDK's "no combined
 shielded↔unshielded call" limitation by making **every circuit single-domain**.
@@ -24,7 +24,7 @@ balance[hash(secret)] = (deposited unshielded + deposited shielded, burnt)
   linkable — a first, simple privacy model (a nullifier scheme would unlink them).
 
 The underlying is native NIGHT (created outside the contract); the shielded side is
-a contract-minted wrapper, color `tokenType("mip12:wrapper", self())`. Locked NIGHT
+a contract-minted wrapper, color `tokenType("night-vault:shielded-wrapper", self())`. Locked NIGHT
 backs unshielded withdrawals; the wrapper is elastic (mint on withdraw, burn on
 deposit). A single-user A-then-B round trip is self-funding: the NIGHT locked by
 `depositUnshielded` is the reserve `withdrawUnshielded` later draws from.

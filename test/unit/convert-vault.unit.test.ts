@@ -208,7 +208,7 @@ describe('ConvertVault (simulator)', () => {
 
   /** Recover the public balance key for `secret` from the ledger map. */
   function vaultKeyOf(secret: Uint8Array): Uint8Array {
-    // The key is persistentHash([pad(32,"mip12:balance"), secret]); rather than
+    // The key is persistentHash([pad(32,"night-vault:balance"), secret]); rather than
     // re-deriving the hash here, find the single entry the tests created.
     for (const [key] of vault.getLedger().balances) {
       void secret;

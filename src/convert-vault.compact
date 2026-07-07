@@ -75,7 +75,7 @@ export sealed ledger _decimals: Uint<8>;
  * @return {Bytes<32>} - The wrapper domain separator.
  */
 circuit wrapDomain(): Bytes<32> {
-  return pad(32, "mip12:shielded-wrapper");
+  return pad(32, "night-vault:shielded-wrapper");
 }
 
 /**
@@ -144,7 +144,7 @@ export circuit tokenColor(): Bytes<32> { return wrapColor(); }
  * @return {Bytes<32>} - The public balance key `hash(secret)`.
  */
 circuit getBalanceKey(secret: Bytes<32>): Bytes<32> {
-  return disclose(persistentHash<Vector<2, Bytes<32>>>([pad(32, "mip12:balance"), secret]));
+  return disclose(persistentHash<Vector<2, Bytes<32>>>([pad(32, "night-vault:balance"), secret]));
 }
 
 /**

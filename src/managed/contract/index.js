@@ -1310,7 +1310,7 @@ export class Contract {
     return result_0;
   }
   _wrapDomain_0() {
-    return new Uint8Array([109, 105, 112, 49, 50, 58, 115, 104, 105, 101, 108, 100, 101, 100, 45, 119, 114, 97, 112, 112, 101, 114, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    return new Uint8Array([110, 105, 103, 104, 116, 45, 118, 97, 117, 108, 116, 58, 115, 104, 105, 101, 108, 100, 101, 100, 45, 119, 114, 97, 112, 112, 101, 114, 0, 0, 0, 0]);
   }
   _wrapColor_0(context, partialProofData) {
     return this._tokenType_0(this._wrapDomain_0(),
@@ -1373,7 +1373,7 @@ export class Contract {
     return this._wrapColor_0(context, partialProofData);
   }
   _getBalanceKey_0(secret_0) {
-    return this._persistentHash_1([new Uint8Array([109, 105, 112, 49, 50, 58, 98, 97, 108, 97, 110, 99, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+    return this._persistentHash_1([new Uint8Array([110, 105, 103, 104, 116, 45, 118, 97, 117, 108, 116, 58, 98, 97, 108, 97, 110, 99, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
                                    secret_0]);
   }
   _creditKey_0(context, partialProofData, balanceKey_0, amount_0) {
