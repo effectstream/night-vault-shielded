@@ -1,3 +1,4 @@
+import * as ledgerV8 from '@midnight-ntwrk/ledger-v8';
 import { describe, expect, test } from 'vitest';
 import * as vault from '../support/convert-vault.js';
 import { describeContract, describeContractWithWallets } from '../support/describe-contract.js';
@@ -9,7 +10,10 @@ import {
   randomBytes32,
   tokenColorHex,
   waitForShieldedBalance,
+  waitForUnshieldedBalance,
 } from '../support/wallet-observations.js';
+
+const NIGHT_HEX = ledgerV8.unshieldedToken().raw;
 
 /**
  * On-chain attack scenarios. These need a real ledger: the properties under
@@ -151,6 +155,71 @@ describe('convert-vault — security', () => {
         // (fees are DUST, never NIGHT).
         const nightNow = await getNightBalance(c.walletCtx);
         expect(night0 - nightNow).toBe(credits + wrapper);
+      },
+      10 * 60_000,
+    );
+
+    test(
+      'combined circuits: forged or double-spent coins cannot drain the reserve; nonce reuse cannot re-mint',
+      async () => {
+        // convertToUnshielded releases NIGHT DIRECTLY from the reserve — there
+        // is no credit step in between, so a forged coin accepted here would be
+        // outright theft (worse than the credit-based depositShielded vectors).
+        // Every acceptance decision is `receiveShielded`, enforced by the
+        // ledger's coin-commitment set: only these on-chain tests can falsify it.
+        const c = ctx();
+        const deployed = await c.deployFresh([...vault.DEPLOY_ARGS]);
+        const address = deployed.deployTxData.public.contractAddress;
+        const color = (await vault.tokenColor(deployed)).private.result;
+        const colorHex = tokenColorHex(color);
+        const me = await getCoinPublicKey(c.walletCtx);
+        const myAddr = vault.rightUserAddress(getUserAddress(c.walletCtx).bytes);
+        const night0 = await getNightBalance(c.walletCtx);
+
+        // --- Vector 1: a coin that was never minted. receiveShielded claims
+        // it, but no wallet can supply the UTXO, so the tx cannot balance.
+        await attemptFails(() =>
+          vault.convertToUnshielded(
+            deployed,
+            { nonce: randomBytes32(), color, value: N },
+            myAddr,
+          ),
+        );
+
+        // Fund the reserve with a real atomic convert (locks N, mints N).
+        const nonce = randomBytes32();
+        const coin = (await vault.convertToShielded(deployed, N, me, nonce)).private.result;
+        await waitForShieldedBalance(c.walletCtx.wallet, colorHex, (b) => b >= N);
+
+        // --- Vector 2: the real coin's nonce with an inflated value. The
+        // commitment doesn't match any owned UTXO, so it cannot balance.
+        await attemptFails(() =>
+          vault.convertToUnshielded(deployed, { ...coin, value: 2n * N }, myAddr),
+        );
+
+        // --- Vector 3: double-spend. The genuine coin converts back once...
+        await vault.convertToUnshielded(deployed, coin, myAddr);
+        await waitForShieldedBalance(c.walletCtx.wallet, colorHex, (b) => b === 0n);
+        expect(await waitForUnshieldedBalance(c.walletCtx.wallet, NIGHT_HEX, (b) => b >= night0)).toBe(night0);
+        // ...and a second release against the same (now spent) coin fails.
+        await attemptFails(() => vault.convertToUnshielded(deployed, coin, myAddr));
+
+        // --- Vector 4: replay-mint. Re-minting with the SAME nonce reproduces
+        // the spent coin's commitment; the append-only commitment set rejects
+        // it even though the original coin is long spent.
+        await attemptFails(() => vault.convertToShielded(deployed, N, me, nonce));
+
+        // The vault itself is undamaged: a fresh nonce round-trips normally.
+        const coin2 = (await vault.convertToShielded(deployed, N, me, randomBytes32())).private
+          .result;
+        await waitForShieldedBalance(c.walletCtx.wallet, colorHex, (b) => b >= N);
+        await vault.convertToUnshielded(deployed, coin2, myAddr);
+        await waitForShieldedBalance(c.walletCtx.wallet, colorHex, (b) => b === 0n);
+
+        // Nothing in the attack sequence created credit or skimmed the reserve.
+        const state = await vault.factory.readLedger(c.providers, address);
+        expect(state?.balances.isEmpty()).toBe(true);
+        expect(await waitForUnshieldedBalance(c.walletCtx.wallet, NIGHT_HEX, (b) => b >= night0)).toBe(night0);
       },
       10 * 60_000,
     );

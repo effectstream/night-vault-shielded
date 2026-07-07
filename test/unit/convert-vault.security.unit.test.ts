@@ -192,4 +192,90 @@ describe('ConvertVault security / border cases (simulator)', () => {
       expect(l._decimals).toBe(DECIMALS);
     });
   });
+
+  describe('combined circuits: value ranges', () => {
+    it('convertToShielded mints the maximum single amount (2^64 - 1)', () => {
+      const coin = vault.convertToShielded(MAX64, RECIPIENT, b32('n'));
+      expect(coin.value).toBe(MAX64);
+      expect(coin.color).toEqual(vault.tokenColor());
+    });
+
+    it('convertToShielded rejects out-of-range amounts at the encoding layer', () => {
+      expect(() => vault.convertToShielded(-1n, RECIPIENT, b32('n'))).toThrow(
+        /expected value of type/,
+      );
+      expect(() => vault.convertToShielded(MAX64 + 1n, RECIPIENT, b32('n'))).toThrow(
+        /expected value of type/,
+      );
+    });
+
+    it('convertToUnshielded releases the maximum coin value and rejects one past the zswap cap', () => {
+      const color = vault.tokenColor();
+      // At the cap: accepted (the Uint<128> field notwithstanding, zswap coins top out at 2^64-1).
+      vault.convertToUnshielded({ nonce: b32('n1'), color, value: MAX64 }, USER);
+      // One past the cap: rejected before any state change.
+      expect(() =>
+        vault.convertToUnshielded({ nonce: b32('n2'), color, value: MAX64 + 1n }, USER),
+      ).toThrow();
+    });
+  });
+
+  describe('combined circuits: loss guards (zero recipients)', () => {
+    // The combined suite covers the zero USER address; these pin the other
+    // Either branch — releasing NIGHT to the zero CONTRACT address would
+    // strand it just as irrecoverably.
+    it('convertToUnshielded refuses the zero contract recipient (left branch)', () => {
+      const coin = vault.convertToShielded(100n, RECIPIENT, b32('n'));
+      expect(() =>
+        vault.convertToUnshielded(coin, {
+          is_left: true,
+          left: { bytes: ZERO32 },
+          right: { bytes: ZERO32 },
+        }),
+      ).toThrow('invalid recipient');
+    });
+
+    it('convertToUnshielded still allows non-zero contract recipients', () => {
+      const coin = vault.convertToShielded(100n, RECIPIENT, b32('n'));
+      vault.convertToUnshielded(coin, {
+        is_left: true,
+        left: { bytes: b32('some-contract') },
+        right: { bytes: ZERO32 },
+      });
+    });
+  });
+
+  describe('combined circuits: interop with the two-step model', () => {
+    // Both models mint the SAME wrapper color, so coins are interchangeable
+    // across them. Users will mix frontends/flows; a color split between the
+    // mint paths would strand one side's coins.
+    it('redeems a two-step-minted coin through the atomic path', () => {
+      vault.depositUnshielded(SECRET, 100n);
+      const twoStep = vault.withdrawShielded(SECRET, 100n, RECIPIENT, b32('n1'));
+      const atomic = vault.convertToShielded(100n, RECIPIENT, b32('n2'));
+      expect(atomic.color).toEqual(twoStep.color); // one color across both mint paths
+      vault.convertToUnshielded(twoStep, USER);
+      expect(vault.getBalance(SECRET)).toBe(0n); // drained credit untouched by the convert
+    });
+
+    it('burns an atomically-minted coin through the two-step credit path', () => {
+      const coin = vault.convertToShielded(100n, RECIPIENT, b32('n'));
+      vault.depositShielded(SECRET, coin);
+      expect(vault.getBalance(SECRET)).toBe(100n);
+      vault.withdrawUnshielded(SECRET, 100n, USER);
+      expect(vault.getBalance(SECRET)).toBe(0n);
+    });
+
+    it('failed converts leave existing credits untouched', () => {
+      vault.depositUnshielded(SECRET, 100n);
+      expect(() =>
+        vault.convertToUnshielded({ nonce: b32('n'), color: b32('foreign'), value: 5n }, USER),
+      ).toThrow("not this vault's shielded wrapper");
+      expect(() => vault.convertToShielded(0n, RECIPIENT, b32('n'))).toThrow(
+        'amount must be positive',
+      );
+      expect(vault.getBalance(SECRET)).toBe(100n);
+      expect(vault.getLedger().balances.size()).toBe(1n);
+    });
+  });
 });
