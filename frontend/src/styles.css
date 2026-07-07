@@ -1,0 +1,156 @@
+:root {
+  --bg: #0b0d12;
+  --panel: #151924;
+  --panel-2: #1c2230;
+  --border: #2a3342;
+  --text: #e6e9ef;
+  --muted: #8b95a7;
+  --accent: #6ee7b7;
+  --accent-2: #38bdf8;
+  --danger: #f87171;
+  --radius: 14px;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: radial-gradient(1200px 600px at 70% -10%, #16202e 0%, var(--bg) 55%);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.app { max-width: 720px; margin: 0 auto; padding: 24px 20px 64px; }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand h1 { font-size: 18px; margin: 0; letter-spacing: 0.3px; }
+.brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+
+.select, .btn, .input {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 14px;
+  outline: none;
+}
+.select:focus, .input:focus { border-color: var(--accent-2); }
+
+.btn { cursor: pointer; font-weight: 600; transition: filter 0.15s, opacity 0.15s; }
+.btn:hover { filter: brightness(1.12); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: linear-gradient(180deg, var(--accent), #34d399); color: #05261b; border: none; }
+.btn-ghost { background: transparent; }
+.btn-block { width: 100%; padding: 14px; font-size: 16px; border-radius: 12px; }
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 18px;
+}
+.card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin: 0 0 14px; }
+
+.leg {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.leg .label { color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+.leg .token { font-weight: 700; font-size: 16px; }
+.leg .amt { font-variant-numeric: tabular-nums; }
+
+.swap-arrow { display: flex; justify-content: center; margin: 8px 0; }
+.swap-arrow button {
+  background: var(--panel-2); border: 1px solid var(--border); color: var(--accent-2);
+  width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 18px;
+}
+
+.row { display: flex; gap: 10px; align-items: center; }
+.grow { flex: 1; }
+.muted { color: var(--muted); }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+.err { color: var(--danger); }
+.ok { color: var(--accent); }
+.small { font-size: 12px; }
+.spacer { height: 8px; }
+
+.balance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.balance-item { background: var(--panel-2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+.balance-item .k { color: var(--muted); font-size: 12px; }
+.balance-item .v { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 4px; }
+
+.steps { display: flex; gap: 8px; margin: 14px 0 4px; }
+.step { flex: 1; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2); font-size: 12px; }
+.step.active { border-color: var(--accent-2); color: var(--accent-2); }
+.step.done { border-color: var(--accent); color: var(--accent); }
+
+.log { max-height: 200px; overflow: auto; }
+.log div { padding: 3px 0; border-bottom: 1px dashed var(--border); }
+
+.pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; border: 1px solid var(--border); color: var(--muted); }
+.badge-connected { color: var(--accent); border-color: var(--accent); }
+
+.pending { border-color: #b45309; }
+.warn { color: #fbbf24; }
+
+/* --- brand (stacked title + nowrap subtitle) --- */
+.brand { align-items: center; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.15; }
+.brand-sub { font-size: 11px; letter-spacing: 0.5px; color: var(--muted); white-space: nowrap; }
+
+/* --- compact connected chip --- */
+.chip-connected {
+  display: inline-flex; align-items: center; gap: 6px;
+  max-width: 190px; padding: 8px 12px;
+  border: 1px solid var(--border); border-radius: 10px; background: var(--panel-2);
+  font-size: 13px; white-space: nowrap; overflow: hidden;
+}
+.dot-ok { width: 8px; height: 8px; }
+.chip-addr { color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; overflow: hidden; text-overflow: ellipsis; }
+
+/* --- compact balances (no boxes) --- */
+.balances { margin: 2px 2px 16px; }
+.balances-row { display: flex; align-items: baseline; gap: 10px; }
+.bal { display: inline-flex; align-items: baseline; gap: 6px; }
+.bal-k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+.bal-v { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.bal-sep { color: var(--border); }
+.link-btn { margin-left: auto; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 15px; }
+.link-btn:hover { color: var(--accent-2); }
+
+/* --- amount field + Max --- */
+.amount-field { display: flex; align-items: center; gap: 8px; }
+.amount-input { width: 150px; text-align: right; }
+.max-btn {
+  background: var(--panel); border: 1px solid var(--border); color: var(--accent-2);
+  border-radius: 8px; padding: 7px 10px; font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.max-btn:hover:not(:disabled) { border-color: var(--accent-2); }
+.max-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* --- direction toggle rotates to point From -> To --- */
+.swap-arrow button { transition: transform 0.2s ease; }
+.swap-arrow button.flipped { transform: rotate(180deg); }
+
+/* --- footer --- */
+.footer { display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; margin-top: 20px; }
+.footer-link { color: var(--muted); text-decoration: none; }
+.footer-link:hover { color: var(--accent-2); }

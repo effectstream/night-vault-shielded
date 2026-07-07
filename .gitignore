@@ -1,6 +1,16 @@
 node_modules/
+dist/
 reports/
 midnight-level-db*/
 .cache/
 *.log
-dist/
+
+# Secrets / local env — never commit; .env.example is the template
+.env
+.env.*
+!.env.example
+
+# Local tooling / state
+.claude/
+.wrangler/
+.debug-tx.hex
