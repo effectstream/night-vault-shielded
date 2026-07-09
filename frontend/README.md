@@ -12,7 +12,6 @@ Vite + React 18 + TypeScript. Adapted from the `midnight-wallet-dapp` reference.
 ```bash
 cd frontend
 bun install
-cp .env.example .env      # then fill in the deployed contract address(es)
 bun run dev               # http://localhost:5173
 ```
 
@@ -29,6 +28,12 @@ so the browser proof step can fetch prover/verifier keys.
 The wallet supplies the indexer / node / proof-server URLs (`getConfiguration()`)
 and owns proving; the dApp only needs the contract address per network. The
 wNIGHT token type is derived from the address.
+
+**`.env` is committed.** It holds only public on-chain addresses, so the
+deployed address per network lives in git history (each redeploy is a commit).
+Secrets never go in it - deploy scripts read `MN_MNEMONIC` / `MN_SEED` from the
+shell environment. For personal overrides use `.env.local` (gitignored; Vite
+loads it over `.env`).
 
 ## How it works
 

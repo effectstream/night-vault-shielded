@@ -63,8 +63,7 @@ The frontend is a Vite + React app that connects to any `window.midnight` wallet
 ```bash
 cd frontend
 bun install
-cp .env.example .env     # set PREVIEW_ADDRESS to your deployed contract
-bun run dev              # http://localhost:5173
+bun run dev              # http://localhost:5173  (uses the committed .env)
 ```
 
 Needs a Midnight wallet extension and the compiled artifacts in `src/managed/` (run `bun run compact` at the repo root if missing). Deploy details and the wallet-proving model are in [frontend/README.md](frontend/README.md).

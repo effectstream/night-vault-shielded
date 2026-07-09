@@ -1,6 +1,9 @@
 node_modules/
 dist/
-.env
+# .env IS committed: it holds only public contract addresses (the deployed
+# address per network - the audit trail lives in git history). Secrets never
+# go there; deploy scripts read MN_MNEMONIC/MN_SEED from the shell env.
+# Personal overrides go in .env.local (Vite loads it over .env).
 .env.local
 *.log
 .debug-tx.hex
