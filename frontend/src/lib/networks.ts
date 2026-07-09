@@ -3,7 +3,7 @@
  * `connect(networkId)` and also fed to midnight-js `setNetworkId`. The contract
  * address is read from one env var per network (`<NETWORK>_ADDRESS`, exposed
  * via vite.config's `envPrefix`), so the same build works across networks.
- * The wrapper (wNIGHT) token type is always derived from the address.
+ * The wrapper (sNight) token type is always derived from the address.
  */
 export interface NetworkOption {
   key: 'preview' | 'preprod' | 'mainnet' | 'undeployed';

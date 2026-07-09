@@ -150,14 +150,14 @@ export class ShieldedNightSimulator {
     );
   }
 
-  /** Atomic NIGHT -> wNIGHT (no secret): lock NIGHT and mint the wrapper. */
+  /** Atomic NIGHT -> sNight (no secret): lock NIGHT and mint the wrapper. */
   convertToShielded(amount: bigint, recipient: { bytes: Uint8Array }, nonce: Uint8Array): ShieldedCoin {
     return this.advance(
       this.contract.impureCircuits.convertToShielded(this.ctx, amount, recipient, nonce),
     );
   }
 
-  /** Atomic wNIGHT -> NIGHT (no secret): burn the wrapper coin and release NIGHT. */
+  /** Atomic sNight -> NIGHT (no secret): burn the wrapper coin and release NIGHT. */
   convertToUnshielded(coin: ShieldedCoin, recipient: EitherContractOrUser): void {
     this.advance(this.contract.impureCircuits.convertToUnshielded(this.ctx, coin, recipient));
   }

@@ -5,8 +5,8 @@ import {
   type ShieldedCoin,
 } from './simulators/ShieldedNightSimulator.js';
 
-const NAME = 'Wrapped NIGHT';
-const SYMBOL = 'wNIGHT';
+const NAME = 'Shielded Night';
+const SYMBOL = 'sNight';
 const DECIMALS = 6n;
 const N = 10_000_000n; // 10 NIGHT at 6 decimals
 

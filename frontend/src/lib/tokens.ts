@@ -46,7 +46,7 @@ export function nativeNightKeys(): string[] {
 }
 
 /**
- * Best-effort derivation of the wrapper (wNIGHT) shielded token color from the
+ * Best-effort derivation of the wrapper (sNight) shielded token color from the
  * contract address, matching the contract's `tokenType(pad(32,"shielded-night:wrapper"), self())`.
  * Returns the raw hex, or null if the SDK shape prevents derivation (the UI
  * falls back to showing the full shielded-balance map).

@@ -1,6 +1,6 @@
 # Shielded NIGHT
 
-Convert native **unshielded NIGHT** into **shielded wNIGHT** (a contract-minted wrapper token) and back, on Midnight.
+Convert native **unshielded NIGHT** into **shielded sNight** (a contract-minted wrapper token) and back, on Midnight.
 
 Live (preview): https://shielded-night.pages.dev
 
@@ -10,8 +10,8 @@ Two ways to convert, both backed by the same pool of locked NIGHT.
 
 **Atomic - one transaction, one wallet approval (what the live app uses):**
 
-- **Unshielded NIGHT -> shielded wNIGHT:** `convertToShielded(amount, recipient, nonce)` locks NIGHT and mints wNIGHT to you, in a single transaction.
-- **Shielded wNIGHT -> unshielded NIGHT:** `convertToUnshielded(coin, recipient)` burns wNIGHT and releases NIGHT to you, in a single transaction.
+- **Unshielded NIGHT -> shielded sNight:** `convertToShielded(amount, recipient, nonce)` locks NIGHT and mints sNight to you, in a single transaction.
+- **Shielded sNight -> unshielded NIGHT:** `convertToUnshielded(coin, recipient)` burns sNight and releases NIGHT to you, in a single transaction.
 
 No secret and no intermediate credit: both value domains net inside one circuit (one ledger segment), which is the only way to combine a shielded and an unshielded move in one transaction. Merging two separate calls can't do it - their intents land in different segments.
 
@@ -19,12 +19,12 @@ No secret and no intermediate credit: both value domains net inside one circuit 
 
 You hold a credit balance keyed by `hash(secret)`; deposit in one domain, withdraw in the other:
 
-- `depositUnshielded(secret, amount)` locks NIGHT and credits your key, then `withdrawShielded(secret, amount, ...)` mints wNIGHT and debits it.
-- `depositShielded(secret, coin)` burns wNIGHT and credits your key, then `withdrawUnshielded(secret, amount, to)` releases NIGHT and debits it.
+- `depositUnshielded(secret, amount)` locks NIGHT and credits your key, then `withdrawShielded(secret, amount, ...)` mints sNight and debits it.
+- `depositShielded(secret, coin)` burns sNight and credits your key, then `withdrawUnshielded(secret, amount, to)` releases NIGHT and debits it.
 
 `secret` is always a private circuit input; only `hash(secret)` (the balance key) is public. Splitting a conversion into two half-steps decouples them - useful when deposit and withdrawal happen at different times, or the recipient differs from the depositor.
 
-Locked NIGHT backs the wrapper 1:1 across both models - the invariant `locked NIGHT == credits + outstanding wNIGHT` keeps every holder solvent.
+Locked NIGHT backs the wrapper 1:1 across both models - the invariant `locked NIGHT == credits + outstanding sNight` keeps every holder solvent.
 
 ## Layout
 
@@ -58,7 +58,7 @@ Locked NIGHT backs the wrapper 1:1 across both models - the invariant `locked NI
 
 ## How to run
 
-The frontend is a Vite + React app that connects to any `window.midnight` wallet (e.g. Lace), reads your NIGHT/wNIGHT balances, and runs the atomic one-transaction swaps (one wallet approval each way). Proving is delegated to the wallet.
+The frontend is a Vite + React app that connects to any `window.midnight` wallet (e.g. Lace), reads your NIGHT/sNight balances, and runs the atomic one-transaction swaps (one wallet approval each way). Proving is delegated to the wallet.
 
 ```bash
 cd frontend

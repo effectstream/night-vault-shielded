@@ -9,7 +9,7 @@ export function BalancePanel({
 }: {
   balances?: Balances;
   onRefresh: () => void;
-  /** wNIGHT this dApp has minted (tracked coins) - used to detect a real mismatch. */
+  /** sNight this dApp has minted (tracked coins) - used to detect a real mismatch. */
   mintedTotal: bigint;
 }) {
   const [copied, setCopied] = useState<string | null>(null);
@@ -53,7 +53,7 @@ export function BalancePanel({
         </span>
         <span className="bal-sep">·</span>
         <span className="bal">
-          <TokenLabel label="wNIGHT" id={balances?.wrapperTokenId} />
+          <TokenLabel label="sNight" id={balances?.wrapperTokenId} />
           <span className="bal-v">{balances ? formatAmount(balances.wrapper) : '-'}</span>
         </span>
         <button className="link-btn" onClick={onRefresh} title="Refresh balances">
@@ -62,7 +62,7 @@ export function BalancePanel({
       </div>
       {anomaly && (
         <p className="small warn" style={{ margin: '6px 0 0' }}>
-          This dApp minted {formatAmount(mintedTotal)} wNIGHT but the wallet doesn't show it under the expected token
+          This dApp minted {formatAmount(mintedTotal)} sNight but the wallet doesn't show it under the expected token
           type (derived from the contract address). Check the network's address in .env matches the deployed contract.
         </p>
       )}

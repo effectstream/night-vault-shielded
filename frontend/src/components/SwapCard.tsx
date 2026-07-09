@@ -5,8 +5,8 @@ import { formatAmount, parseAmount } from '../lib/tokens';
 import { type Direction, runConvertToShielded, runConvertToUnshielded, type SwapStep } from '../lib/swap';
 
 const TOKENS = {
-  toShielded: { from: 'NIGHT', to: 'wNIGHT' },
-  toUnshielded: { from: 'wNIGHT', to: 'NIGHT' },
+  toShielded: { from: 'NIGHT', to: 'sNight' },
+  toUnshielded: { from: 'sNight', to: 'NIGHT' },
 } as const;
 
 export function SwapCard({ sn }: { sn: ShieldedNightState }) {
@@ -25,7 +25,7 @@ export function SwapCard({ sn }: { sn: ShieldedNightState }) {
     setLocalErr(undefined);
   };
 
-  // Max = the wallet's balance in the "from" token: NIGHT for forward, wNIGHT
+  // Max = the wallet's balance in the "from" token: NIGHT for forward, sNight
   // for reverse (the wallet funds the conversion + change during balancing).
   const maxBase = direction === 'toShielded' ? (sn.balances?.nativeNight ?? 0n) : (sn.balances?.wrapper ?? 0n);
   const onMax = () => {
@@ -134,8 +134,8 @@ export function SwapCard({ sn }: { sn: ShieldedNightState }) {
 
       {direction === 'toUnshielded' && (
         <p className="small muted" style={{ marginBottom: 0 }}>
-          Converts wNIGHT back to NIGHT; the wallet selects coins and makes change. Available:{' '}
-          <b>{formatAmount(sn.balances?.wrapper ?? 0n)}</b> wNIGHT.
+          Converts sNight back to NIGHT; the wallet selects coins and makes change. Available:{' '}
+          <b>{formatAmount(sn.balances?.wrapper ?? 0n)}</b> sNight.
         </p>
       )}
 

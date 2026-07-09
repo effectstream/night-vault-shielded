@@ -27,7 +27,7 @@ const ZERO32 = new Uint8Array(32);
 describe('ShieldedNight combined circuits (simulator)', () => {
   let contract: ShieldedNightSimulator;
   beforeEach(() => {
-    contract = new ShieldedNightSimulator('Wrapped NIGHT', 'wNIGHT', 6n);
+    contract = new ShieldedNightSimulator('Shielded Night', 'sNight', 6n);
   });
 
   describe('convertToShielded', () => {

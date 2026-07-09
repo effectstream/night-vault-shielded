@@ -8,8 +8,8 @@
  *   MN_ENV=preview MN_MNEMONIC="word1 word2 … word24" bun run scripts/deploy-and-lock.ts
  *   MN_ENV=preview MN_SEED=<hex-seed> bun run scripts/deploy-and-lock.ts
  *
- *   # optional metadata overrides (default: "Wrapped NIGHT" / "wNIGHT" / 6)
- *   CV_NAME="Wrapped NIGHT" CV_SYMBOL=wNIGHT CV_DECIMALS=6 MN_ENV=preview MN_MNEMONIC="…" bun run scripts/deploy-and-lock.ts
+ *   # optional metadata overrides (default: "Shielded Night" / "sNight" / 6)
+ *   CV_NAME="Shielded Night" CV_SYMBOL=sNight CV_DECIMALS=6 MN_ENV=preview MN_MNEMONIC="…" bun run scripts/deploy-and-lock.ts
  *
  * Env:
  *   MN_ENV       preview | preprod | undeployed | qanet   (default: preview)

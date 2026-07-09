@@ -34,7 +34,7 @@ describe('shielded-night - combined single-tx converts', () => {
         const night0 = await getNightBalance(c.walletCtx);
         expect(night0).toBeGreaterThanOrEqual(N);
 
-        // --- NIGHT -> wNIGHT in one call (receiveUnshielded + mint) ---
+        // --- NIGHT -> sNight in one call (receiveUnshielded + mint) ---
         const nonce = randomBytes32();
         const coin = (
           await contract.convertToShielded(deployed, N, await getCoinPublicKey(c.walletCtx), nonce)
@@ -47,7 +47,7 @@ describe('shielded-night - combined single-tx converts', () => {
         const nightAfterMint = await waitForUnshieldedBalance(c.walletCtx.wallet, NIGHT_HEX, (b) => b <= night0 - N);
         expect(nightAfterMint).toBe(night0 - N);
 
-        // --- wNIGHT -> NIGHT in one call (receiveShielded + sendUnshielded) ---
+        // --- sNight -> NIGHT in one call (receiveShielded + sendUnshielded) ---
         await contract.convertToUnshielded(
           deployed,
           coin,

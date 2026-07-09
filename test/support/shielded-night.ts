@@ -27,7 +27,7 @@ export type ShieldedNightProviders = ContractProviders<typeof factory>;
 export type DeployedShieldedNight = ContractDeployed<typeof factory>;
 
 /** Constructor args used by every test deploy: 6 decimals to match native NIGHT. */
-export const DEPLOY_ARGS = ['Wrapped NIGHT', 'wNIGHT', 6n] as const;
+export const DEPLOY_ARGS = ['Shielded Night', 'sNight', 6n] as const;
 
 export const deploy = (providers: ShieldedNightProviders, zkConfigPath: string): Promise<DeployedShieldedNight> =>
   factory.deploy(providers, zkConfigPath, [...DEPLOY_ARGS]);
@@ -72,7 +72,7 @@ export const withdrawShielded = (
   nonce: Uint8Array,
 ) => deployed.callTx.withdrawShielded(secret, amount, recipient, nonce);
 
-/** Atomic NIGHT -> wNIGHT in one tx (no secret). */
+/** Atomic NIGHT -> sNight in one tx (no secret). */
 export const convertToShielded = (
   deployed: DeployedShieldedNight,
   amount: bigint,
@@ -80,7 +80,7 @@ export const convertToShielded = (
   nonce: Uint8Array,
 ) => deployed.callTx.convertToShielded(amount, recipient, nonce);
 
-/** Atomic wNIGHT -> NIGHT in one tx (no secret). */
+/** Atomic sNight -> NIGHT in one tx (no secret). */
 export const convertToUnshielded = (
   deployed: DeployedShieldedNight,
   coin: { nonce: Uint8Array; color: Uint8Array; value: bigint },

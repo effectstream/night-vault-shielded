@@ -1,7 +1,7 @@
-# ShieldedNight Frontend — NIGHT ⇄ wNIGHT DEX
+# ShieldedNight Frontend — NIGHT ⇄ sNight DEX
 
 A browser dApp for the ShieldedNight contract: convert native unshielded **NIGHT**
-into the shielded wrapper **wNIGHT** and back. Connects to any `window.midnight[*]`
+into the shielded wrapper **sNight** and back. Connects to any `window.midnight[*]`
 wallet, reads shielded + unshielded balances, and targets preview / preprod
 (mainnet later) via a network dropdown.
 
@@ -27,7 +27,7 @@ so the browser proof step can fetch prover/verifier keys.
 
 The wallet supplies the indexer / node / proof-server URLs (`getConfiguration()`)
 and owns proving; the dApp only needs the contract address per network. The
-wNIGHT token type is derived from the address.
+sNight token type is derived from the address.
 
 **`.env` is committed.** It holds only public on-chain addresses, so the
 deployed address per network lives in git history (each redeploy is a commit).
@@ -41,21 +41,21 @@ Each conversion is **two transactions** with a pool credit keyed by a
 client-generated secret held between them. One **Swap** click orchestrates both
 legs (two wallet approvals) with a step indicator:
 
-- **NIGHT → wNIGHT**: `depositUnshielded(secret, amount)` → `withdrawShielded(secret, amount, myCoinPublicKey, nonce)`.
-- **wNIGHT → NIGHT**: `depositShielded(secret, coin)` → `withdrawUnshielded(secret, coin.value, myAddress)`.
+- **NIGHT → sNight**: `depositUnshielded(secret, amount)` → `withdrawShielded(secret, amount, myCoinPublicKey, nonce)`.
+- **sNight → NIGHT**: `depositShielded(secret, coin)` → `withdrawUnshielded(secret, coin.value, myAddress)`.
 
 The secret and any minted wrapper coin are persisted to `localStorage`, so an
 interrupted swap can be resumed (see the "Unfinished swaps" panel) and minted
-wNIGHT can be converted back later.
+sNight can be converted back later.
 
 ### Reverse-direction limitation (read this)
 
 The `window.midnight` connector exposes only **aggregate** shielded balances — it
 does not reveal individual coins or their nonces. `depositShielded` needs the
-exact `ShieldedCoinInfo{nonce, color, value}`. So **wNIGHT → NIGHT works only for
+exact `ShieldedCoinInfo{nonce, color, value}`. So **sNight → NIGHT works only for
 wrapper coins this dApp minted in this browser** (tracked in `localStorage`). The
 reverse UI is enabled regardless; if there is no tracked coin it surfaces a clear
-error rather than failing silently. Converting arbitrary/received wNIGHT would
+error rather than failing silently. Converting arbitrary/received sNight would
 require a coin-level wallet API that does not exist today. The reverse swap
 converts a whole tracked coin at a time (remainder-free).
 
@@ -63,9 +63,9 @@ converts a whole tracked coin at a time (remainder-free).
 
 1. `bun run dev`; install a Midnight wallet extension set to **preview**.
 2. Put the preview contract address in `.env`, reload.
-3. Click **Connect wallet** (top-right) → approve. Balances panel shows NIGHT + wNIGHT.
-4. Enter an amount, **Swap NIGHT → wNIGHT**, approve both prompts → wNIGHT balance rises.
-5. Flip direction, **Swap wNIGHT → NIGHT** (converts a dApp-minted coin) → NIGHT rises.
+3. Click **Connect wallet** (top-right) → approve. Balances panel shows NIGHT + sNight.
+4. Enter an amount, **Swap NIGHT → sNight**, approve both prompts → sNight balance rises.
+5. Flip direction, **Swap sNight → NIGHT** (converts a dApp-minted coin) → NIGHT rises.
 
 ## Build
 

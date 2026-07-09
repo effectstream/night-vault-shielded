@@ -23,7 +23,7 @@ export function WalletBar({ sn }: { sn: ShieldedNightState }) {
         <span className="dot" />
         <div className="brand-text">
           <h1>Shielded NIGHT</h1>
-          <span className="brand-sub">NIGHT ⇄ wNIGHT</span>
+          <span className="brand-sub">NIGHT ⇄ sNight</span>
         </div>
       </div>
 

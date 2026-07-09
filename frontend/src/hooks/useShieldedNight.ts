@@ -37,7 +37,7 @@ export interface ShieldedNightState {
 
   balances?: Balances;
   refreshBalances: () => Promise<void>;
-  /** The wrapper (wNIGHT) 32-byte color hex for the selected network, if known. */
+  /** The wrapper (sNight) 32-byte color hex for the selected network, if known. */
   wrapperColorHex?: string;
   /** Wrapper token metadata read from the contract's public ledger, once connected. */
   tokenName?: string;

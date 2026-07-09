@@ -50,7 +50,7 @@ export function PendingSwaps({ sn }: { sn: ShieldedNightState }) {
         <div key={s.id} className="leg" style={{ marginBottom: 8 }}>
           <div>
             <div className="token small">
-              {s.direction === 'toShielded' ? 'NIGHT → wNIGHT' : 'wNIGHT → NIGHT'} · {formatAmount(BigInt(s.amount))}
+              {s.direction === 'toShielded' ? 'NIGHT → sNight' : 'sNight → NIGHT'} · {formatAmount(BigInt(s.amount))}
             </div>
             <div className="mono small muted">secret {s.secretHex.slice(0, 12)}…</div>
           </div>

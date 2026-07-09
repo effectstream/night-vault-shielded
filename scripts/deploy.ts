@@ -10,8 +10,8 @@
  *   # or from a raw hex seed:
  *   MN_ENV=preview MN_SEED=<hex-seed> bun run scripts/deploy.ts
  *
- *   # optional metadata overrides (default: "Wrapped NIGHT" / "wNIGHT" / 6)
- *   CV_NAME="Wrapped NIGHT" CV_SYMBOL=wNIGHT CV_DECIMALS=6 MN_ENV=preview MN_MNEMONIC="…" bun run scripts/deploy.ts
+ *   # optional metadata overrides (default: "Shielded Night" / "sNight" / 6)
+ *   CV_NAME="Shielded Night" CV_SYMBOL=sNight CV_DECIMALS=6 MN_ENV=preview MN_MNEMONIC="…" bun run scripts/deploy.ts
  *
  * Env:
  *   MN_ENV       preview | preprod | undeployed | qanet   (default: preview)

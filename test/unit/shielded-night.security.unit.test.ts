@@ -18,8 +18,8 @@ import {
  * they need a real ledger to reject unbalanced transactions.
  */
 
-const NAME = 'Wrapped NIGHT';
-const SYMBOL = 'wNIGHT';
+const NAME = 'Shielded Night';
+const SYMBOL = 'sNight';
 const DECIMALS = 6n;
 
 const MAX64 = (1n << 64n) - 1n;

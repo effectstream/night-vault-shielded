@@ -51,8 +51,8 @@ describe('shielded-night', () => {
       const address = deployed.deployTxData.public.contractAddress;
       expect(address.length).toBeGreaterThan(0);
 
-      expect((await contract.name(deployed)).private.result).toBe('Wrapped NIGHT');
-      expect((await contract.symbol(deployed)).private.result).toBe('wNIGHT');
+      expect((await contract.name(deployed)).private.result).toBe('Shielded Night');
+      expect((await contract.symbol(deployed)).private.result).toBe('sNight');
       expect((await contract.decimals(deployed)).private.result).toBe(6n);
 
       const color1 = (await contract.tokenColor(deployed)).private.result;
@@ -62,8 +62,8 @@ describe('shielded-night', () => {
 
       const ledgerState = await contract.factory.readLedger(c.providers, address);
       expect(ledgerState).not.toBeNull();
-      expect(ledgerState?._name).toBe('Wrapped NIGHT');
-      expect(ledgerState?._symbol).toBe('wNIGHT');
+      expect(ledgerState?._name).toBe('Shielded Night');
+      expect(ledgerState?._symbol).toBe('sNight');
       expect(ledgerState?._decimals).toBe(6n);
       expect(ledgerState?.balances.isEmpty()).toBe(true);
     });
