@@ -21,6 +21,18 @@ export default defineConfig({
     global: 'globalThis',
   },
   resolve: {
+    // The compiled contract lives OUTSIDE this package root (../src/managed) and
+    // would resolve the WASM-bearing midnight packages from the ROOT
+    // node_modules while frontend code resolves its own copies - two WASM
+    // instances whose classes fail each other's instanceof checks ("expected
+    // instance of ChargedState" when reading ledger state). Dedupe forces a
+    // single instance for every importer, dev and build alike.
+    dedupe: [
+      '@midnight-ntwrk/compact-runtime',
+      '@midnight-ntwrk/onchain-runtime-v3',
+      '@midnight-ntwrk/ledger-v8',
+      '@midnight-ntwrk/compact-js',
+    ],
     alias: {
       process: 'process/browser',
       buffer: 'buffer',
