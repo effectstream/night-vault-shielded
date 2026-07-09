@@ -15,12 +15,14 @@ Two ways to convert, both backed by the same pool of locked NIGHT.
 
 No secret and no intermediate credit: both value domains net inside one circuit (one ledger segment), which is the only way to combine a shielded and an unshielded move in one transaction. Merging two separate calls can't do it - their intents land in different segments.
 
-**Two-step pool - credit-bridged (the original model, still on-chain):**
+**Two-step pool - credit-bridged**
 
 You hold a credit balance keyed by `hash(secret)`; deposit in one domain, withdraw in the other:
 
-- `depositUnshielded(secret, amount)` locks NIGHT and credits your key, then `withdrawShielded(secret, amount, ...)` mints sNight and debits it.
-- `depositShielded(secret, coin)` burns sNight and credits your key, then `withdrawUnshielded(secret, amount, to)` releases NIGHT and debits it.
+- `depositUnshielded(secret, amount)` locks NIGHT and credits your key,
+- `depositShielded(secret, coin)` burns sNight and credits your key.
+- `withdrawShielded(secret, amount, ...)` mints sNight and debits it.
+- `withdrawUnshielded(secret, amount, to)` releases NIGHT and debits it.
 
 `secret` is always a private circuit input; only `hash(secret)` (the balance key) is public. Splitting a conversion into two half-steps decouples them - useful when deposit and withdrawal happen at different times, or the recipient differs from the depositor.
 
