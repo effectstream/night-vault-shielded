@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { ContractState } from '@midnight-ntwrk/compact-runtime';
 import type { ConnectedAPI, InitialAPI } from '@midnight-ntwrk/dapp-connector-api';
 import { setNetworkId } from '@midnight-ntwrk/midnight-js/network-id';
 import { findInitialAPIs, isCompatibleApiVersion } from '../lib/connector';
@@ -107,7 +108,14 @@ export function useShieldedNight(): ShieldedNightState {
       try {
         const state = await providers.publicDataProvider.queryContractState(contractAddress);
         if (cancelled || state == null) return;
-        const l = ledger(state.data);
+        // queryContractState deserializes with ledger-v8's WASM module, while
+        // the compiled contract's ledger() expects compact-runtime's classes -
+        // instanceof fails across the two WASM instances in the browser bundle
+        // ("expected instance of ..."). Cross the boundary via bytes: serialize
+        // with one module, deserialize with the other (byte-compatible wire
+        // format, verified against the live contract).
+        const runtimeState = ContractState.deserialize(state.serialize());
+        const l = ledger(runtimeState.data);
         setTokenName(l._name);
         setTokenSymbol(l._symbol);
       } catch (e) {
